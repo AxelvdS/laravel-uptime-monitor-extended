@@ -1,0 +1,55 @@
+{
+    "name": "axelvds/laravel-uptime-monitor-extended",
+    "description": "Extended uptime monitoring package for Laravel with IP/ping support, per-monitor frequency, active toggle, and dashboard widgets",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "uptime",
+        "monitoring",
+        "ping",
+        "ssl",
+        "dashboard",
+        "widgets"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "AxelvdS",
+            "email": "your-email@example.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/database": "^10.0|^11.0",
+        "illuminate/console": "^10.0|^11.0",
+        "spatie/laravel-uptime-monitor": "^3.0"
+    },
+    "suggest": {
+        "filament/filament": "^3.0|^4.0 - For Filament admin panel integration (optional)"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AxelvdS\\UptimeMonitorExtended\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AxelvdS\\UptimeMonitorExtended\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AxelvdS\\UptimeMonitorExtended\\UptimeMonitorExtendedServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
+
