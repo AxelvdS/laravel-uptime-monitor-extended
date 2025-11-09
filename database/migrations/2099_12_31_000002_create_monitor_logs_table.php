@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if the monitors table exists before trying to create foreign key
+        if (!Schema::hasTable('monitors')) {
+            throw new \RuntimeException(
+                'The monitors table does not exist. Please run Spatie\'s Laravel Uptime Monitor migrations first.'
+            );
+        }
+
         Schema::create('monitors_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('monitor_id');
-            $table->foreign('monitor_id')->references('id')->on('monitors')->onDelete('cascade');
             $table->enum('status', ['up', 'down', 'ssl_expired', 'ssl_expiring'])->default('up');
             $table->string('response_time_ms')->nullable();
             $table->text('error_message')->nullable();
@@ -26,6 +32,14 @@ return new class extends Migration
             $table->index('status');
             $table->index('checked_at');
         });
+
+        // Create foreign key constraint separately to ensure proper type matching
+        Schema::table('monitors_logs', function (Blueprint $table) {
+            $table->foreign('monitor_id')
+                ->references('id')
+                ->on('monitors')
+                ->onDelete('cascade');
+        });
     }
 
     /**
@@ -33,6 +47,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('monitors_logs', function (Blueprint $table) {
+            $table->dropForeign(['monitor_id']);
+        });
+        
         Schema::dropIfExists('monitors_logs');
     }
 };
