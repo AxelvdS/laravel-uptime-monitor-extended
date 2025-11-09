@@ -24,6 +24,7 @@ class DevicesDownTableWidget extends BaseWidget
             ->defaultSort('last_checked', 'desc')
             ->actions([]) // Disable actions since we're using arrays, not Models
             ->bulkActions([]) // Disable bulk actions
+            ->recordAction(null) // Explicitly disable record action
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')

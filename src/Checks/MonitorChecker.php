@@ -167,19 +167,30 @@ class MonitorChecker
                 'message' => $isUp ? 'HTTP check successful' : "HTTP check failed (Status: {$statusCode})",
             ];
         } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+            $status = 'down';
+            
+            // Check if it's an SSL certificate error
+            if (str_contains($errorMessage, 'SSL certificate') || str_contains($errorMessage, 'certificate has expired')) {
+                $status = 'ssl_expired';
+            } elseif (str_contains($errorMessage, 'certificate') && str_contains($errorMessage, 'expired')) {
+                $status = 'ssl_expired';
+            }
+            
             Log::error('HTTP check failed', [
                 'monitor_id' => $monitor->id,
-                'error' => $e->getMessage(),
+                'error' => $errorMessage,
+                'status' => $status,
             ]);
 
-            $this->logCheck($monitor, 'down', [
-                'error' => $e->getMessage(),
+            $this->logCheck($monitor, $status, [
+                'error' => $errorMessage,
             ]);
 
             return [
                 'success' => false,
-                'status' => 'down',
-                'message' => $e->getMessage(),
+                'status' => $status,
+                'message' => $errorMessage,
             ];
         }
     }
