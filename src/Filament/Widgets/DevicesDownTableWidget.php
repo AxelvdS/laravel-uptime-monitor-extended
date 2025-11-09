@@ -6,6 +6,7 @@ use AxelvdS\UptimeMonitorExtended\Dashboard\Widgets\DevicesDownTable;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Support\Collection;
 
 class DevicesDownTableWidget extends BaseWidget
 {
@@ -59,10 +60,10 @@ class DevicesDownTableWidget extends BaseWidget
             ]);
     }
 
-    public function getTableRecords(): array
+    public function getTableRecords(): Collection
     {
         $widget = new DevicesDownTable();
-        return $widget->getData(10);
+        return collect($widget->getData(10));
     }
 }
 
