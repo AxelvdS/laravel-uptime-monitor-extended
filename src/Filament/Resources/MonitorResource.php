@@ -56,6 +56,7 @@ class MonitorResource extends Resource
                 Forms\Components\TextInput::make('url')
                     ->label('URL, IP Address, or Host:Port')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->live(onBlur: true)
                     ->helperText('Enter a URL (http:// or https://), IP address for ping, or host:port for TCP (e.g., 192.168.1.1:22)')
                     ->maxLength(255)
@@ -157,7 +158,14 @@ class MonitorResource extends Resource
                     ->label('URL/IP')
                     ->searchable()
                     ->sortable()
-                    ->copyable(),
+                    ->copyable()
+                    ->formatStateUsing(function ($state): string {
+                        // Convert URL object to string if needed
+                        if (is_object($state) && method_exists($state, '__toString')) {
+                            return (string) $state;
+                        }
+                        return (string) $state;
+                    }),
 
                 Tables\Columns\TextColumn::make('monitor_type')
                     ->label('Type')

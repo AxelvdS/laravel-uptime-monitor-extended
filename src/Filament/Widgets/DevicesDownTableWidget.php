@@ -13,7 +13,7 @@ class DevicesDownTableWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 2;
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -21,6 +21,9 @@ class DevicesDownTableWidget extends BaseWidget
             ->query($this->query())
             ->heading('Devices Currently Down')
             ->description('Monitors that are currently down or have SSL issues')
+            ->defaultSort('last_checked', 'desc')
+            ->actions([]) // Disable actions since we're using arrays, not Models
+            ->bulkActions([]) // Disable bulk actions
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')

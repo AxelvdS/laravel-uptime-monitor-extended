@@ -113,33 +113,55 @@ class MonitorChecker
      */
     protected function checkHttp(Monitor $monitor): array
     {
-        // Use Spatie's built-in check functionality
-        // This will trigger Spatie's events and logging
+        // Use HTTP client to check the URL directly
+        // This avoids relying on Spatie's internal methods which may not exist in v4
         try {
-            $monitor->checkUptime();
+            $url = (string) $monitor->url;
+            $startTime = microtime(true);
             
-            // Determine status based on Spatie's check results
-            $status = $monitor->uptime_check_failed_at ? 'down' : 'up';
+            $client = new \GuzzleHttp\Client([
+                'timeout' => 10,
+                'verify' => true,
+                'allow_redirects' => true,
+                'http_errors' => false, // Don't throw exceptions on HTTP errors
+            ]);
             
-            // Check SSL if applicable
-            if (str_starts_with($monitor->url, 'https://')) {
-                if ($monitor->certificate_expires_at && $monitor->certificate_expires_at->isPast()) {
-                    $status = 'ssl_expired';
-                } elseif ($monitor->certificate_expires_at && $monitor->certificate_expires_at->isFuture() && $monitor->certificate_expires_at->diffInDays(now()) < 7) {
-                    $status = 'ssl_expiring';
+            $response = $client->get($url);
+            $responseTime = (microtime(true) - $startTime) * 1000; // Convert to milliseconds
+            
+            $statusCode = $response->getStatusCode();
+            $isUp = $statusCode >= 200 && $statusCode < 400;
+            
+            $status = $isUp ? 'up' : 'down';
+            
+            // Check SSL certificate if HTTPS
+            if (str_starts_with($url, 'https://')) {
+                try {
+                    $certInfo = $this->getCertificateInfo($url);
+                    if ($certInfo && isset($certInfo['valid_to'])) {
+                        $expiresAt = \Carbon\Carbon::createFromTimestamp($certInfo['valid_to']);
+                        if ($expiresAt->isPast()) {
+                            $status = 'ssl_expired';
+                        } elseif ($expiresAt->diffInDays(now()) < 7) {
+                            $status = 'ssl_expiring';
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // SSL check failed, but HTTP might still be up
                 }
             }
 
             // Log the check
             $this->logCheck($monitor, $status, [
-                'response_time_ms' => null, // Spatie doesn't expose this directly
-                'error' => $monitor->uptime_check_failed_at ? 'Uptime check failed' : null,
+                'response_time_ms' => round($responseTime, 2),
+                'error' => $isUp ? null : "HTTP {$statusCode}",
             ]);
 
             return [
-                'success' => $status === 'up',
+                'success' => $isUp && $status !== 'ssl_expired',
                 'status' => $status,
-                'message' => $status === 'up' ? 'HTTP check successful' : 'HTTP check failed',
+                'response_time_ms' => round($responseTime, 2),
+                'message' => $isUp ? 'HTTP check successful' : "HTTP check failed (Status: {$statusCode})",
             ];
         } catch (\Exception $e) {
             Log::error('HTTP check failed', [
@@ -156,6 +178,54 @@ class MonitorChecker
                 'status' => 'down',
                 'message' => $e->getMessage(),
             ];
+        }
+    }
+
+    /**
+     * Get SSL certificate information for HTTPS URLs.
+     */
+    protected function getCertificateInfo(string $url): ?array
+    {
+        try {
+            $parsed = parse_url($url);
+            $host = $parsed['host'] ?? null;
+            $port = $parsed['port'] ?? 443;
+            
+            if (!$host) {
+                return null;
+            }
+            
+            $context = stream_context_create([
+                'ssl' => [
+                    'capture_peer_cert' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ]);
+            
+            $socket = @stream_socket_client(
+                "ssl://{$host}:{$port}",
+                $errno,
+                $errstr,
+                5,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
+            
+            if (!$socket) {
+                return null;
+            }
+            
+            $params = stream_context_get_params($socket);
+            $cert = $params['options']['ssl']['peer_certificate'] ?? null;
+            
+            if ($cert) {
+                return openssl_x509_parse($cert);
+            }
+            
+            return null;
+        } catch (\Exception $e) {
+            return null;
         }
     }
 
