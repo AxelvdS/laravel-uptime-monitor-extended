@@ -4,6 +4,7 @@ namespace AxelvdS\UptimeMonitorExtended;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Console\Scheduling\Schedule;
 
 class UptimeMonitorExtendedServiceProvider extends ServiceProvider
 {
@@ -49,6 +50,32 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
             // Register legacy dashboard routes/views only if Filament is not installed
             $this->registerLegacyDashboard();
         }
+
+        // Auto-register scheduled commands if enabled in config
+        if (config('uptime-monitor-extended.auto_schedule', true)) {
+            $this->registerScheduledCommands();
+        }
+    }
+
+    /**
+     * Register scheduled commands.
+     */
+    protected function registerScheduledCommands(): void
+    {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            
+            // Check monitors every minute
+            $schedule->command('uptime-monitor:check-extended')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground();
+            
+            // Clean up old logs daily
+            $schedule->command('uptime-monitor:cleanup-logs')
+                ->daily()
+                ->withoutOverlapping();
+        });
     }
 
     /**
