@@ -237,15 +237,32 @@ By default, the package automatically registers scheduled commands. No manual co
 - Monitor checks: Every minute
 - Log cleanup: Daily
 
+> **Note**: Automatic scheduling may not be visible in your `routes/console.php` file, but the commands are still registered and will run. If you prefer to see and control the scheduling explicitly, use manual scheduling below.
+
 **Manual Scheduling (Optional)**
 
-If you prefer to manually control scheduling, you can disable auto-scheduling by setting in your `.env`:
+If you prefer to manually control scheduling or want to see the scheduled commands explicitly in your `routes/console.php` file, you can disable auto-scheduling by setting in your `.env`:
 
 ```env
 UPTIME_MONITOR_AUTO_SCHEDULE=false
 ```
 
-Then add to your `app/Console/Kernel.php`:
+Then add to your `routes/console.php` (Laravel 11+):
+
+```php
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('uptime-monitor:check-extended')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground();
+
+Schedule::command('uptime-monitor:cleanup-logs')
+    ->daily()
+    ->withoutOverlapping();
+```
+
+Or for Laravel 10, add to your `app/Console/Kernel.php`:
 
 ```php
 protected function schedule(Schedule $schedule)
@@ -253,11 +270,13 @@ protected function schedule(Schedule $schedule)
     // Check monitors every minute
     $schedule->command('uptime-monitor:check-extended')
         ->everyMinute()
-        ->withoutOverlapping();
+        ->withoutOverlapping()
+        ->runInBackground();
     
     // Clean up old logs daily
     $schedule->command('uptime-monitor:cleanup-logs')
-        ->daily();
+        ->daily()
+        ->withoutOverlapping();
 }
 ```
 

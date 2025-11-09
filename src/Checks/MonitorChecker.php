@@ -152,10 +152,8 @@ class MonitorChecker
                     
                     // Check for revoked certificate (basic check - full OCSP/CRL check would be more complex)
                     // Note: This is a simplified check. Full revocation checking requires OCSP or CRL lookup
-                    if (isset($certInfo['extensions']['authorityKeyIdentifier'] ?? null)) {
-                        // Certificate has extensions, but we can't easily check revocation without OCSP/CRL
-                        // Revoked certificates will typically fail during the initial connection
-                    }
+                    // Revoked certificates will typically fail during the initial connection
+                    // (Removed isset check as it's not needed - revocation is detected via exception handling)
                 } catch (\Exception $e) {
                     // SSL check failed, but HTTP might still be up
                     // If the error mentions revoked, expired, or untrusted, we'll catch it in the exception handler
