@@ -9,6 +9,11 @@ class CreateMonitor extends CreateRecord
 {
     protected static string $resource = MonitorResource::class;
 
+    public function getTitle(): string
+    {
+        return 'Create ' . config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Ensure look_for_string is an empty string if null (Spatie's column is NOT NULL DEFAULT '')

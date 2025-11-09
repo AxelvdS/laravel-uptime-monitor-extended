@@ -26,6 +26,16 @@ class MonitorResource extends Resource
         return config('uptime-monitor-extended.filament.navigation_group', 'Monitoring');
     }
 
+    public static function getModelLabel(): string
+    {
+        return config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -46,8 +56,49 @@ class MonitorResource extends Resource
                 Forms\Components\TextInput::make('url')
                     ->label('URL, IP Address, or Host:Port')
                     ->required()
+                    ->live(onBlur: true)
                     ->helperText('Enter a URL (http:// or https://), IP address for ping, or host:port for TCP (e.g., 192.168.1.1:22)')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        if (empty($state)) {
+                            return;
+                        }
+
+                        // Check for protocol first
+                        if (str_starts_with($state, 'https://')) {
+                            $set('monitor_type', 'https');
+                            return;
+                        }
+                        
+                        if (str_starts_with($state, 'http://')) {
+                            $set('monitor_type', 'http');
+                            return;
+                        }
+
+                        // Remove protocol if present for further checks
+                        $cleanUrl = preg_replace('#^https?://#', '', $state);
+                        
+                        // Check for host:port format (TCP port check)
+                        // Must have a colon and the part after colon should be a number
+                        if (preg_match('#^(.+):(\d+)$#', $cleanUrl, $matches)) {
+                            $port = (int) $matches[2];
+                            if ($port >= 1 && $port <= 65535) {
+                                $set('monitor_type', 'tcp');
+                                return;
+                            }
+                        }
+                        
+                        // Check if it's a valid IP address (for ping)
+                        if (filter_var($cleanUrl, FILTER_VALIDATE_IP)) {
+                            $set('monitor_type', 'ping');
+                            return;
+                        }
+
+                        // Default to https if it looks like a URL
+                        if (str_contains($cleanUrl, '.')) {
+                            $set('monitor_type', 'https');
+                        }
+                    }),
 
                 Forms\Components\Select::make('monitor_type')
                     ->label('Monitor Type')
@@ -57,7 +108,7 @@ class MonitorResource extends Resource
                         'ping' => 'Ping (ICMP)',
                         'tcp' => 'TCP Port',
                     ])
-                    ->default('https')
+                    // ->default('https')
                     ->required()
                     ->helperText('Select the type of monitoring to perform. For TCP Port, use format: host:port (e.g., 192.168.1.1:22)'),
 

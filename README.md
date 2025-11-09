@@ -231,7 +231,21 @@ php artisan uptime-monitor:check-extended --monitor-id=1
 
 ### Scheduling Checks
 
-Add to your `app/Console/Kernel.php`:
+**Automatic Scheduling (Default)**
+
+By default, the package automatically registers scheduled commands. No manual configuration is required! The commands are scheduled to run:
+- Monitor checks: Every minute
+- Log cleanup: Daily
+
+**Manual Scheduling (Optional)**
+
+If you prefer to manually control scheduling, you can disable auto-scheduling by setting in your `.env`:
+
+```env
+UPTIME_MONITOR_AUTO_SCHEDULE=false
+```
+
+Then add to your `app/Console/Kernel.php`:
 
 ```php
 protected function schedule(Schedule $schedule)
@@ -245,6 +259,12 @@ protected function schedule(Schedule $schedule)
     $schedule->command('uptime-monitor:cleanup-logs')
         ->daily();
 }
+```
+
+**Important:** Make sure your Laravel scheduler is running. Add this to your crontab:
+
+```bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ### Dashboard

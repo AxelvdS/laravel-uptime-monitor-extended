@@ -10,6 +10,11 @@ class EditMonitor extends EditRecord
 {
     protected static string $resource = MonitorResource::class;
 
+    public function getTitle(): string
+    {
+        return 'Edit ' . config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
