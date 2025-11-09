@@ -154,7 +154,7 @@ class MonitorResource extends Resource
                                 ->where('status', $data['status'])
                                 ->whereIn('id', function ($subQuery) {
                                     $subQuery->selectRaw('MAX(id)')
-                                        ->from('monitor_logs')
+                                        ->from('monitors_logs')
                                         ->groupBy('monitor_id');
                                 })
                                 ->pluck('monitor_id');

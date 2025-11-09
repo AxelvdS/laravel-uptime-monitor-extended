@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MonitorLog extends Model
 {
+    protected $table = 'monitors_logs';
+
     protected $fillable = [
         'monitor_id',
         'status',

@@ -14,7 +14,7 @@ class UpDownWidget
         $latestLogs = MonitorLog::select('monitor_id', 'status', 'checked_at')
             ->whereIn('id', function ($query) {
                 $query->select(DB::raw('MAX(id)'))
-                    ->from('monitor_logs')
+                    ->from('monitors_logs')
                     ->groupBy('monitor_id');
             })
             ->get();
