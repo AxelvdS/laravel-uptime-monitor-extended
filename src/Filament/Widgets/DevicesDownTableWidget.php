@@ -29,16 +29,24 @@ class DevicesDownTableWidget extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
-                    ->getStateUsing(fn (array $record) => $record['id'] ?? null)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('url')
                     ->label('URL/IP')
-                    ->getStateUsing(fn (array $record) => $record['url'] ?? null)
+                    ->formatStateUsing(function ($state) {
+                        // Convert URL object to string if needed
+                        $url = is_object($state) && method_exists($state, '__toString') 
+                            ? (string) $state 
+                            : (string) $state;
+                        
+                        // Remove // prefix that Spatie's URL object adds
+                        $url = preg_replace('#^//+#', '', $url);
+                        
+                        return $url;
+                    })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\TextColumn::make('monitor_type')
                     ->label('Type')
                     ->badge()
-                    ->getStateUsing(fn (array $record) => $record['type'] ?? null)
                     ->color(fn (string $state): string => match ($state) {
                         'https' => 'primary',
                         'http' => 'success',
@@ -49,7 +57,10 @@ class DevicesDownTableWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->getStateUsing(fn (array $record) => $record['status'] ?? null)
+                    ->getStateUsing(function ($record) {
+                        // Get status from custom attribute (set in getTableRecords)
+                        return $record->getAttribute('status') ?? null;
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'down' => 'danger',
                         'ssl_expired' => 'warning',
@@ -57,12 +68,21 @@ class DevicesDownTableWidget extends BaseWidget
                     }),
                 Tables\Columns\TextColumn::make('error_message')
                     ->label('Error')
-                    ->getStateUsing(fn (array $record) => $record['error_message'] ?? null)
+                    ->getStateUsing(function ($record) {
+                        // Get error_message from custom attribute (set in getTableRecords)
+                        return $record->getAttribute('error_message') ?? null;
+                    })
                     ->limit(50)
-                    ->tooltip(fn (array $record) => $record['error_message'] ?? null),
+                    ->tooltip(function ($record) {
+                        return $record->getAttribute('error_message') ?? null;
+                    }),
                 Tables\Columns\TextColumn::make('last_checked')
                     ->label('Last Checked')
-                    ->getStateUsing(fn (array $record) => $record['last_checked'] ?? null)
+                    ->getStateUsing(function ($record) {
+                        // Get last_checked from custom attribute (set in getTableRecords)
+                        $lastChecked = $record->getAttribute('last_checked') ?? null;
+                        return $lastChecked ? \Carbon\Carbon::parse($lastChecked) : null;
+                    })
                     ->dateTime()
                     ->since(),
             ]);
@@ -82,11 +102,37 @@ class DevicesDownTableWidget extends BaseWidget
     /**
      * Get the table records.
      * This overrides the default query-based behavior to use custom data.
+     * We convert arrays to Models so Filament can handle them properly.
      */
     public function getTableRecords(): Collection
     {
         $widget = new DevicesDownTable();
-        return Collection::make($widget->getData(10));
+        $data = $widget->getData(10);
+        
+        // Get the actual Monitor models from the database
+        $monitorIds = collect($data)->pluck('id')->filter()->toArray();
+        $monitors = \Spatie\UptimeMonitor\Models\Monitor::whereIn('id', $monitorIds)->get()->keyBy('id');
+        
+        // Map data to actual Monitor models and add custom attributes
+        $models = collect($data)->map(function ($item) use ($monitors) {
+            $monitor = $monitors->get($item['id'] ?? null);
+            
+            if (!$monitor) {
+                // Fallback: create a new model if not found
+                $monitor = new \Spatie\UptimeMonitor\Models\Monitor();
+                $monitor->id = $item['id'] ?? null;
+                $monitor->exists = true;
+            }
+            
+            // Add custom attributes from DevicesDownTable data
+            $monitor->setAttribute('status', $item['status'] ?? null);
+            $monitor->setAttribute('error_message', $item['error_message'] ?? null);
+            $monitor->setAttribute('last_checked', $item['last_checked'] ?? null);
+            
+            return $monitor;
+        })->filter();
+        
+        return Collection::make($models);
     }
 
 }
