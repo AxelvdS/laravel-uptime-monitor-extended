@@ -6,6 +6,7 @@ use AxelvdS\UptimeMonitorExtended\Dashboard\Widgets\DevicesDownTable;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class DevicesDownTableWidget extends BaseWidget
@@ -60,6 +61,20 @@ class DevicesDownTableWidget extends BaseWidget
             ]);
     }
 
+    /**
+     * Get the table query.
+     * Required by Filament, but not used since we override getTableRecords().
+     */
+    protected function query(): Builder
+    {
+        // Return an empty query since we're using custom data via getTableRecords()
+        return \Spatie\UptimeMonitor\Models\Monitor::query()->whereRaw('1 = 0');
+    }
+
+    /**
+     * Get the table records.
+     * This overrides the default query-based behavior to use custom data.
+     */
     public function getTableRecords(): Collection
     {
         $widget = new DevicesDownTable();
