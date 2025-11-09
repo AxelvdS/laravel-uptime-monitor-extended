@@ -87,5 +87,13 @@ class DevicesDownTableWidget extends BaseWidget
         $widget = new DevicesDownTable();
         return Collection::make($widget->getData(10));
     }
+
+    /**
+     * Override to prevent Filament from trying to get record actions on arrays.
+     */
+    protected function getTableRecordActionUsing(): ?\Closure
+    {
+        return null;
+    }
 }
 

@@ -149,8 +149,16 @@ class MonitorChecker
                             $status = 'ssl_expiring';
                         }
                     }
+                    
+                    // Check for revoked certificate (basic check - full OCSP/CRL check would be more complex)
+                    // Note: This is a simplified check. Full revocation checking requires OCSP or CRL lookup
+                    if (isset($certInfo['extensions']['authorityKeyIdentifier'] ?? null)) {
+                        // Certificate has extensions, but we can't easily check revocation without OCSP/CRL
+                        // Revoked certificates will typically fail during the initial connection
+                    }
                 } catch (\Exception $e) {
                     // SSL check failed, but HTTP might still be up
+                    // If the error mentions revoked, expired, or untrusted, we'll catch it in the exception handler
                 }
             }
 
@@ -166,15 +174,59 @@ class MonitorChecker
                 'response_time_ms' => round($responseTime, 2),
                 'message' => $isUp ? 'HTTP check successful' : "HTTP check failed (Status: {$statusCode})",
             ];
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $errorMessage = $e->getMessage();
+            $status = 'down';
+            
+            // Check for various SSL certificate errors
+            $lowerError = strtolower($errorMessage);
+            
+            if (str_contains($lowerError, 'certificate has expired') || 
+                str_contains($lowerError, 'certificate expired') ||
+                str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
+                $status = 'ssl_expired';
+            } elseif (str_contains($lowerError, 'certificate has been revoked') ||
+                      str_contains($lowerError, 'certificate revoked') ||
+                      str_contains($lowerError, 'revoked certificate')) {
+                $status = 'ssl_expired'; // Treat revoked as expired for now
+            } elseif (str_contains($lowerError, 'self signed certificate') ||
+                      str_contains($lowerError, 'self-signed')) {
+                $status = 'ssl_expired'; // Treat self-signed as expired
+            } elseif (str_contains($lowerError, 'untrusted') ||
+                      str_contains($lowerError, 'unable to verify')) {
+                $status = 'ssl_expired'; // Treat untrusted as expired
+            }
+            
+            Log::error('HTTP check failed', [
+                'monitor_id' => $monitor->id,
+                'error' => $errorMessage,
+                'status' => $status,
+            ]);
+
+            $this->logCheck($monitor, $status, [
+                'error' => $errorMessage,
+            ]);
+
+            return [
+                'success' => false,
+                'status' => $status,
+                'message' => $errorMessage,
+            ];
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             $status = 'down';
             
-            // Check if it's an SSL certificate error
-            if (str_contains($errorMessage, 'SSL certificate') || str_contains($errorMessage, 'certificate has expired')) {
+            // Check for SSL certificate errors in generic exceptions too
+            $lowerError = strtolower($errorMessage);
+            
+            if (str_contains($lowerError, 'certificate has expired') || 
+                str_contains($lowerError, 'certificate expired') ||
+                str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
                 $status = 'ssl_expired';
-            } elseif (str_contains($errorMessage, 'certificate') && str_contains($errorMessage, 'expired')) {
-                $status = 'ssl_expired';
+            } elseif (str_contains($lowerError, 'certificate has been revoked') ||
+                      str_contains($lowerError, 'certificate revoked') ||
+                      str_contains($lowerError, 'revoked certificate')) {
+                $status = 'ssl_expired'; // Treat revoked as expired for now
             }
             
             Log::error('HTTP check failed', [
