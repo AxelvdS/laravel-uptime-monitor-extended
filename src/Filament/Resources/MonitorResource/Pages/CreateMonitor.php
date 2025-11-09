@@ -14,6 +14,11 @@ class CreateMonitor extends CreateRecord
         // Ensure look_for_string is an empty string if null (Spatie's column is NOT NULL DEFAULT '')
         $data['look_for_string'] = $data['look_for_string'] ?? '';
 
+        // Convert URL object to string if it's an object (shouldn't happen on create, but just in case)
+        if (isset($data['url']) && is_object($data['url'])) {
+            $data['url'] = (string) $data['url'];
+        }
+
         return $data;
     }
 }
