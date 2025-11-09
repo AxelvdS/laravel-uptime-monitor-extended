@@ -15,13 +15,16 @@ return new class extends Migration
         // Update enum values in monitors_logs table
         // MySQL doesn't support direct enum modification, so we need to alter the column
         if (Schema::hasTable('monitors_logs')) {
-            // For MySQL/MariaDB, we need to modify the enum
-            DB::statement("ALTER TABLE `monitors_logs` MODIFY COLUMN `status` ENUM('up', 'down', 'ssl_issue', 'ssl_expiring') DEFAULT 'up'");
-            
-            // Update existing records
+            // First, update existing records from ssl_expired to ssl_issue
+            // We need to do this before modifying the enum, otherwise MySQL will complain
+            // about data truncation
             DB::table('monitors_logs')
                 ->where('status', 'ssl_expired')
                 ->update(['status' => 'ssl_issue']);
+            
+            // Now modify the enum to remove ssl_expired and add ssl_issue
+            // For MySQL/MariaDB, we need to modify the enum
+            DB::statement("ALTER TABLE `monitors_logs` MODIFY COLUMN `status` ENUM('up', 'down', 'ssl_issue', 'ssl_expiring') DEFAULT 'up'");
         }
     }
 
