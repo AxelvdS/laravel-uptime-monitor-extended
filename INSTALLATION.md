@@ -52,7 +52,7 @@ php artisan migrate
 
 This will automatically run migrations in the correct order:
 1. **Spatie's migrations** - Creates the `monitors` table
-2. **This package's migrations** - Extends the `monitors` table with additional columns (monitor_type, frequency_minutes, is_active, etc.) and creates the `monitor_logs` table
+2. **This package's migrations** - Extends the `monitors` table with additional columns (monitor_type, frequency_minutes, is_active, etc.) and creates the `monitors_logs` table
 
 > **Note**: The migrations are timestamped to ensure they run in the correct order automatically. If you get an error about the `monitors` table not existing, make sure you've published Spatie's migrations first (Step 2).
 

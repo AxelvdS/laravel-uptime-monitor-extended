@@ -66,7 +66,7 @@ php artisan vendor:publish --provider="AxelvdS\UptimeMonitorExtended\UptimeMonit
 
 This will publish:
 - Configuration file: `config/uptime-monitor-extended.php`
-- Migrations: `database/migrations/` (extends monitors table and creates monitor_logs table)
+- Migrations: `database/migrations/` (extends monitors table and creates monitors_logs table)
 
 4. Run the migrations:
 
@@ -76,7 +76,7 @@ php artisan migrate
 
 This will automatically run migrations in the correct order:
 1. **Spatie's migrations** - Creates the `monitors` table
-2. **This package's migrations** - Extends the `monitors` table and creates the `monitor_logs` table
+2. **This package's migrations** - Extends the `monitors` table and creates the `monitors_logs` table
 
 > **Note**: The migrations are timestamped to ensure they run in the correct order automatically. If you get an error about the `monitors` table not existing, make sure you've published Spatie's migrations first (step 2).
 
@@ -363,7 +363,7 @@ The package extends Spatie's `monitors` table with:
 - `ping_timeout` - Ping timeout (for ping monitors)
 - `notes` - Optional notes/description
 
-It also creates a `monitor_logs` table for storing check history.
+It also creates a `monitors_logs` table for storing check history.
 
 ## Troubleshooting
 
