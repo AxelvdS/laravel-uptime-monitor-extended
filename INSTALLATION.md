@@ -56,7 +56,7 @@ This will automatically run migrations in the correct order:
 
 > **Note**: The migrations are timestamped to ensure they run in the correct order automatically. If you get an error about the `monitors` table not existing, make sure you've published Spatie's migrations first (Step 2).
 
-## Step 6: Configure Environment Variables (Optional)
+## Step 5: Configure Environment Variables (Optional)
 
 Add these to your `.env` file:
 
@@ -122,7 +122,7 @@ Monitor::create([
 ]);
 ```
 
-## Step 9: Test the Installation
+## Step 8: Test the Installation
 
 Run a manual check:
 
