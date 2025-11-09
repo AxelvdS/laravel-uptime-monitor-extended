@@ -18,6 +18,7 @@ class DevicesDownTableWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
+            ->query($this->query())
             ->heading('Devices Currently Down')
             ->description('Monitors that are currently down or have SSL issues')
             ->columns([
@@ -65,7 +66,7 @@ class DevicesDownTableWidget extends BaseWidget
      * Get the table query.
      * Required by Filament for table operations, but we override getTableRecords() for custom data.
      */
-    public function query(): Builder
+    protected function query(): Builder
     {
         // Return a query for the Monitor model (required by Filament)
         // This is used for model detection, but actual records come from getTableRecords()
