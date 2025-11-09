@@ -36,13 +36,11 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
         // Load migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
-        // Register commands
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                \AxelvdS\UptimeMonitorExtended\Commands\CheckMonitorsExtended::class,
-                \AxelvdS\UptimeMonitorExtended\Commands\CleanupLogs::class,
-            ]);
-        }
+        // Register commands (always register, not just in console, so they can be called via Artisan::call())
+        $this->commands([
+            \AxelvdS\UptimeMonitorExtended\Commands\CheckMonitorsExtended::class,
+            \AxelvdS\UptimeMonitorExtended\Commands\CleanupLogs::class,
+        ]);
 
         // Register Filament features if Filament is installed
         if ($this->isFilamentInstalled()) {

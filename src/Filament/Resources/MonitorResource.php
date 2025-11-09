@@ -22,6 +22,19 @@ class MonitorResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->label('Name')
+                    ->required()
+                    ->helperText('A friendly name to identify this monitor (e.g., "Main Router", "API Server")')
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+
+                Forms\Components\Textarea::make('description')
+                    ->label('Description')
+                    ->helperText('Optional description of what this monitor is for')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+
                 Forms\Components\TextInput::make('url')
                     ->label('URL or IP Address')
                     ->required()
@@ -74,10 +87,17 @@ class MonitorResource extends Resource
                     ->label('ID')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Name')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('url')
                     ->label('URL/IP')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->copyable(),
 
                 Tables\Columns\TextColumn::make('monitor_type')
                     ->label('Type')

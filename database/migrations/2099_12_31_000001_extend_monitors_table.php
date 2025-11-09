@@ -44,9 +44,19 @@ return new class extends Migration
                 $table->integer('ping_timeout')->nullable()->after('last_check_at');
             }
 
+            // Add name field for identifying the monitor
+            if (!Schema::hasColumn('monitors', 'name')) {
+                $table->string('name')->nullable()->after('ping_timeout');
+            }
+
+            // Add description field
+            if (!Schema::hasColumn('monitors', 'description')) {
+                $table->text('description')->nullable()->after('name');
+            }
+
             // Add notes/description field
             if (!Schema::hasColumn('monitors', 'notes')) {
-                $table->text('notes')->nullable()->after('ping_timeout');
+                $table->text('notes')->nullable()->after('description');
             }
         });
     }
@@ -63,6 +73,8 @@ return new class extends Migration
                 'is_active',
                 'last_check_at',
                 'ping_timeout',
+                'name',
+                'description',
                 'notes',
             ]);
         });

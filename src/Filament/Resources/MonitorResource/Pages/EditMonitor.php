@@ -24,5 +24,15 @@ class EditMonitor extends EditRecord
 
         return $data;
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Convert Spatie's Url object to string for Livewire compatibility
+        if (isset($data['url']) && is_object($data['url'])) {
+            $data['url'] = (string) $data['url'];
+        }
+
+        return $data;
+    }
 }
 

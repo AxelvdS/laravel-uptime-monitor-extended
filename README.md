@@ -90,7 +90,7 @@ If you're using Laravel Filament and want to use the Filament resources and widg
 composer require filament/filament:"^3.0|^4.0"
 ```
 
-2. Register the resources and widgets in your Filament panel provider (typically `app/Providers/Filament/AdminPanelProvider.php`):
+2. Register the resources and widgets in your Filament panel provider (typically `app/Providers/Filament/AdminPanelProvider.php`) and make sure they are not already there:
 
 ```php
 use AxelvdS\UptimeMonitorExtended\Filament\UptimeMonitorExtendedFilamentServiceProvider;
