@@ -59,7 +59,7 @@ class DevicesDownTableWidget extends BaseWidget
             ]);
     }
 
-    protected function getTableRecords(): array
+    public function getTableRecords(): array
     {
         $widget = new DevicesDownTable();
         return $widget->getData(10);
