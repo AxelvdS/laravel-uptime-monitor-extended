@@ -6,7 +6,7 @@ use AxelvdS\UptimeMonitorExtended\Dashboard\Widgets\DevicesDownTable;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
 class DevicesDownTableWidget extends BaseWidget
 {
