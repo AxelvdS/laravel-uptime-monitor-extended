@@ -63,12 +63,13 @@ class DevicesDownTableWidget extends BaseWidget
 
     /**
      * Get the table query.
-     * Required by Filament, but not used since we override getTableRecords().
+     * Required by Filament for table operations, but we override getTableRecords() for custom data.
      */
-    protected function query(): Builder
+    public function query(): Builder
     {
-        // Return an empty query since we're using custom data via getTableRecords()
-        return \Spatie\UptimeMonitor\Models\Monitor::query()->whereRaw('1 = 0');
+        // Return a query for the Monitor model (required by Filament)
+        // This is used for model detection, but actual records come from getTableRecords()
+        return \Spatie\UptimeMonitor\Models\Monitor::query();
     }
 
     /**
