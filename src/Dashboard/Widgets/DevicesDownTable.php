@@ -35,7 +35,7 @@ class DevicesDownTable
             $latestLog = $latestLogs->get($monitor->id);
             
             $data[] = [
-                'id' => $monitor->id,
+                'name' => $monitor->name,
                 'url' => $monitor->url,
                 'type' => $monitor->monitor_type ?? 'https',
                 'status' => $latestLog->status ?? 'unknown',
