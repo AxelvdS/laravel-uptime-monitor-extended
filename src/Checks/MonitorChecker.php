@@ -174,23 +174,23 @@ class MonitorChecker
             $errorMessage = $e->getMessage();
             $status = 'down';
             
-            // Check for various SSL certificate errors
+            // Check for SSL errors FIRST - if it contains 'ssl' and any SSL-related keywords, it's an SSL issue
             $lowerError = strtolower($errorMessage);
             
-            if (str_contains($lowerError, 'certificate has expired') || 
-                str_contains($lowerError, 'certificate expired') ||
-                str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
-                $status = 'ssl_issue';
-            } elseif (str_contains($lowerError, 'certificate has been revoked') ||
+            if (str_contains($lowerError, 'ssl') && (
+                      str_contains($lowerError, 'hostname') ||
+                      str_contains($lowerError, 'subject name') ||
+                      str_contains($lowerError, 'certificate problem') ||
+                      str_contains($lowerError, 'certificate has expired') ||
+                      str_contains($lowerError, 'certificate expired') ||
+                      str_contains($lowerError, 'certificate has been revoked') ||
                       str_contains($lowerError, 'certificate revoked') ||
-                      str_contains($lowerError, 'revoked certificate')) {
-                $status = 'ssl_issue'; // Treat revoked as expired for now
-            } elseif (str_contains($lowerError, 'self signed certificate') ||
-                      str_contains($lowerError, 'self-signed')) {
-                $status = 'ssl_issue'; // Treat self-signed as expired
-            } elseif (str_contains($lowerError, 'untrusted') ||
-                      str_contains($lowerError, 'unable to verify')) {
-                $status = 'ssl_issue'; // Treat untrusted as expired
+                      str_contains($lowerError, 'revoked certificate') ||
+                      str_contains($lowerError, 'self signed certificate') ||
+                      str_contains($lowerError, 'self-signed') ||
+                      str_contains($lowerError, 'untrusted') ||
+                      str_contains($lowerError, 'unable to verify'))) {
+                $status = 'ssl_issue';
             }
             
             // Only log unexpected errors, not expected SSL certificate issues
@@ -218,16 +218,23 @@ class MonitorChecker
             $status = 'down';
             
             // Check for SSL certificate errors in generic exceptions too
+            // Check SSL errors FIRST before defaulting to 'down'
             $lowerError = strtolower($errorMessage);
             
-            if (str_contains($lowerError, 'certificate has expired') || 
-                str_contains($lowerError, 'certificate expired') ||
-                str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
-                $status = 'ssl_issue';
-            } elseif (str_contains($lowerError, 'certificate has been revoked') ||
+            if (str_contains($lowerError, 'ssl') && (
+                      str_contains($lowerError, 'hostname') ||
+                      str_contains($lowerError, 'subject name') ||
+                      str_contains($lowerError, 'certificate problem') ||
+                      str_contains($lowerError, 'certificate has expired') ||
+                      str_contains($lowerError, 'certificate expired') ||
+                      str_contains($lowerError, 'certificate has been revoked') ||
                       str_contains($lowerError, 'certificate revoked') ||
-                      str_contains($lowerError, 'revoked certificate')) {
-                $status = 'ssl_issue'; // Treat revoked as expired for now
+                      str_contains($lowerError, 'revoked certificate') ||
+                      str_contains($lowerError, 'self signed certificate') ||
+                      str_contains($lowerError, 'self-signed') ||
+                      str_contains($lowerError, 'untrusted') ||
+                      str_contains($lowerError, 'unable to verify'))) {
+                $status = 'ssl_issue';
             }
             
             // Only log unexpected errors, not expected SSL certificate issues
