@@ -4,27 +4,14 @@ This guide will walk you through installing and setting up Laravel Uptime Monito
 
 ## Prerequisites
 
-- PHP 8.1 or higher
+- PHP 8.1 or higher (PHP 8.3+ recommended)
 - Laravel 10.0 or higher
 - Composer
 - Database (MySQL, PostgreSQL, SQLite, etc.)
 
-## Step 1: Install Spatie's Laravel Uptime Monitor
+> **Note**: Spatie's Laravel Uptime Monitor (v4.0+) will be automatically installed as a dependency.
 
-This package extends Spatie's Laravel Uptime Monitor, so you need to install it first:
-
-```bash
-composer require spatie/laravel-uptime-monitor
-```
-
-Publish and run Spatie's migrations:
-
-```bash
-php artisan vendor:publish --provider="Spatie\UptimeMonitor\UptimeMonitorServiceProvider"
-php artisan migrate
-```
-
-## Step 2: Install This Package
+## Step 1: Install This Package
 
 Install the extended package:
 
@@ -32,7 +19,17 @@ Install the extended package:
 composer require axelvds/laravel-uptime-monitor-extended
 ```
 
-## Step 3: Publish Configuration and Migrations
+> **Note**: Spatie's Laravel Uptime Monitor (v4.0+) is automatically installed as a dependency. You don't need to install it separately.
+
+## Step 2: Publish Spatie's Migrations
+
+Publish Spatie's migrations:
+
+```bash
+php artisan vendor:publish --provider="Spatie\UptimeMonitor\UptimeMonitorServiceProvider"
+```
+
+## Step 3: Publish This Package's Configuration and Migrations
 
 Publish the package assets:
 
@@ -47,13 +44,19 @@ This will publish:
 
 ## Step 4: Run Migrations
 
-Run the migrations to extend the monitors table and create the logs table:
+Run the migrations:
 
 ```bash
 php artisan migrate
 ```
 
-## Step 5: Configure Environment Variables (Optional)
+This will automatically run migrations in the correct order:
+1. **Spatie's migrations** - Creates the `monitors` table
+2. **This package's migrations** - Extends the `monitors` table with additional columns (monitor_type, frequency_minutes, is_active, etc.) and creates the `monitor_logs` table
+
+> **Note**: The migrations are timestamped to ensure they run in the correct order automatically. If you get an error about the `monitors` table not existing, make sure you've published Spatie's migrations first (Step 2).
+
+## Step 6: Configure Environment Variables (Optional)
 
 Add these to your `.env` file:
 
@@ -70,7 +73,7 @@ UPTIME_MONITOR_GRAPH_DATA_POINTS=24
 UPTIME_MONITOR_DASHBOARD_REFRESH=60
 ```
 
-## Step 6: Schedule Commands
+## Step 7: Schedule Commands
 
 Add these commands to your `app/Console/Kernel.php`:
 
@@ -88,7 +91,7 @@ protected function schedule(Schedule $schedule)
 }
 ```
 
-## Step 7: Create Your First Monitor
+## Step 8: Create Your First Monitor
 
 You can create monitors via Artisan command (using Spatie's commands):
 
@@ -119,7 +122,7 @@ Monitor::create([
 ]);
 ```
 
-## Step 8: Test the Installation
+## Step 9: Test the Installation
 
 Run a manual check:
 

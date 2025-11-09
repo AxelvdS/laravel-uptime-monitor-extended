@@ -35,9 +35,9 @@ If you're using Laravel Filament, you also get:
 
 ## Requirements
 
-- PHP 8.1 or higher
+- PHP 8.1 or higher (PHP 8.3+ recommended)
 - Laravel 10.0 or higher
-- [Spatie Laravel Uptime Monitor](https://github.com/spatie/laravel-uptime-monitor) (v3.0+)
+- [Spatie Laravel Uptime Monitor](https://github.com/spatie/laravel-uptime-monitor) (v4.0+) - **Automatically installed as a dependency**
 
 **Optional (for Filament integration):**
 - [Laravel Filament](https://filamentphp.com) (v3.0+ or v4.0+)
@@ -50,25 +50,35 @@ If you're using Laravel Filament, you also get:
 composer require axelvds/laravel-uptime-monitor-extended
 ```
 
-2. Install Spatie's Laravel Uptime Monitor (if not already installed):
+> **Note**: Spatie's Laravel Uptime Monitor is automatically installed as a dependency. You don't need to install it separately.
+
+2. Publish Spatie's migrations:
 
 ```bash
-composer require spatie/laravel-uptime-monitor
 php artisan vendor:publish --provider="Spatie\UptimeMonitor\UptimeMonitorServiceProvider"
-php artisan migrate
 ```
 
-3. Publish the package configuration and migrations:
+3. Publish this package's configuration and migrations:
 
 ```bash
 php artisan vendor:publish --provider="AxelvdS\UptimeMonitorExtended\UptimeMonitorExtendedServiceProvider"
 ```
+
+This will publish:
+- Configuration file: `config/uptime-monitor-extended.php`
+- Migrations: `database/migrations/` (extends monitors table and creates monitor_logs table)
 
 4. Run the migrations:
 
 ```bash
 php artisan migrate
 ```
+
+This will automatically run migrations in the correct order:
+1. **Spatie's migrations** - Creates the `monitors` table
+2. **This package's migrations** - Extends the `monitors` table and creates the `monitor_logs` table
+
+> **Note**: The migrations are timestamped to ensure they run in the correct order automatically. If you get an error about the `monitors` table not existing, make sure you've published Spatie's migrations first (step 2).
 
 ### Filament Integration (Optional)
 
