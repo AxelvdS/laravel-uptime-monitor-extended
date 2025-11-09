@@ -26,12 +26,12 @@ class MonitorResource extends Resource
         return config('uptime-monitor-extended.filament.navigation_group', 'Monitoring');
     }
 
-    public static function getModelLabel(): string
+    public static function getLabel(): string
     {
         return config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
     }
 
-    public static function getPluralModelLabel(): string
+    public static function getPluralLabel(): string
     {
         return config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
     }
