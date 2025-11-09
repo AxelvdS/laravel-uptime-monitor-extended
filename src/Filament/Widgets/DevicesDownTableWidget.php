@@ -13,7 +13,7 @@ class DevicesDownTableWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 2;
 
     public function table(Table $table): Table
     {

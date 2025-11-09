@@ -49,5 +49,29 @@ class UptimeGraphWidget extends ChartWidget
     {
         return 'line';
     }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+            'maintainAspectRatio' => false,
+            'responsive' => true,
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                ],
+            ],
+        ];
+    }
+
+    protected function getHeight(): ?int
+    {
+        return 200; // Make it flatter - same height as a stat widget
+    }
 }
 

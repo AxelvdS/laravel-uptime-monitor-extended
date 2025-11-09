@@ -221,19 +221,17 @@ class MonitorResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Status'),
 
-                Tables\Filters\Filter::make('status')
-                    ->form([
-                        Forms\Components\Select::make('status')
-                            ->options([
-                                'up' => 'Up',
-                                'down' => 'Down',
-                                'ssl_expired' => 'SSL Expired',
-                            ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'up' => 'Up',
+                        'down' => 'Down',
+                        'ssl_expired' => 'SSL Expired',
                     ])
                     ->query(function ($query, array $data) {
-                        if (!empty($data['status'])) {
+                        if (!empty($data['value'])) {
                             $monitorIds = \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::select('monitor_id')
-                                ->where('status', $data['status'])
+                                ->where('status', $data['value'])
                                 ->whereIn('id', function ($subQuery) {
                                     $subQuery->selectRaw('MAX(id)')
                                         ->from('monitors_logs')
