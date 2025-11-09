@@ -63,7 +63,7 @@ class DevicesDownTableWidget extends BaseWidget
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'down' => 'danger',
-                        'ssl_expired' => 'warning',
+                        'ssl_issue' => 'warning',
                         default => 'secondary',
                     }),
                 Tables\Columns\TextColumn::make('error_message')

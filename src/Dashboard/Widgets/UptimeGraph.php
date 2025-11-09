@@ -43,7 +43,7 @@ class UptimeGraph
                 'time' => $current->toIso8601String(),
                 'up' => 0,
                 'down' => 0,
-                'ssl_expired' => 0,
+                'ssl_issue' => 0,
             ];
             $current->addHours(1);
         }

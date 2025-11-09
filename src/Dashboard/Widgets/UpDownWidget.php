@@ -28,7 +28,7 @@ class UpDownWidget
             match ($log->status) {
                 'up' => $up++,
                 'down' => $down++,
-                'ssl_expired' => $sslExpired++,
+                'ssl_issue' => $sslExpired++,
                 default => null,
             };
         }
@@ -37,7 +37,7 @@ class UpDownWidget
             'total' => $total,
             'up' => $up,
             'down' => $down,
-            'ssl_expired' => $sslExpired,
+            'ssl_issue' => $sslExpired,
             'percentage_up' => $total > 0 ? round(($up / $total) * 100, 2) : 0,
         ];
     }

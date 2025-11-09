@@ -124,7 +124,7 @@ class MonitorChecker
             
             $client = new \GuzzleHttp\Client([
                 'timeout' => 10,
-                'verify' => true,
+                'verify' => true, // Enable SSL verification
                 'allow_redirects' => true,
                 'http_errors' => false, // Don't throw exceptions on HTTP errors
             ]);
@@ -144,16 +144,16 @@ class MonitorChecker
                     if ($certInfo && isset($certInfo['valid_to'])) {
                         $expiresAt = \Carbon\Carbon::createFromTimestamp($certInfo['valid_to']);
                         if ($expiresAt->isPast()) {
-                            $status = 'ssl_expired';
+                            $status = 'ssl_issue';
                         } elseif ($expiresAt->diffInDays(now()) < 7) {
                             $status = 'ssl_expiring';
                         }
                     }
                     
-                    // Check for revoked certificate (basic check - full OCSP/CRL check would be more complex)
-                    // Note: This is a simplified check. Full revocation checking requires OCSP or CRL lookup
-                    // Revoked certificates will typically fail during the initial connection
-                    // (Removed isset check as it's not needed - revocation is detected via exception handling)
+                    // Check for revoked certificate using OCSP
+                    if ($certInfo && $this->isCertificateRevoked($certInfo, $url)) {
+                        $status = 'ssl_issue'; // Treat revoked as expired
+                    }
                 } catch (\Exception $e) {
                     // SSL check failed, but HTTP might still be up
                     // If the error mentions revoked, expired, or untrusted, we'll catch it in the exception handler
@@ -167,7 +167,7 @@ class MonitorChecker
             ]);
 
             return [
-                'success' => $isUp && $status !== 'ssl_expired',
+                'success' => $isUp && $status !== 'ssl_issue',
                 'status' => $status,
                 'response_time_ms' => round($responseTime, 2),
                 'message' => $isUp ? 'HTTP check successful' : "HTTP check failed (Status: {$statusCode})",
@@ -182,24 +182,28 @@ class MonitorChecker
             if (str_contains($lowerError, 'certificate has expired') || 
                 str_contains($lowerError, 'certificate expired') ||
                 str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
-                $status = 'ssl_expired';
+                $status = 'ssl_issue';
             } elseif (str_contains($lowerError, 'certificate has been revoked') ||
                       str_contains($lowerError, 'certificate revoked') ||
                       str_contains($lowerError, 'revoked certificate')) {
-                $status = 'ssl_expired'; // Treat revoked as expired for now
+                $status = 'ssl_issue'; // Treat revoked as expired for now
             } elseif (str_contains($lowerError, 'self signed certificate') ||
                       str_contains($lowerError, 'self-signed')) {
-                $status = 'ssl_expired'; // Treat self-signed as expired
+                $status = 'ssl_issue'; // Treat self-signed as expired
             } elseif (str_contains($lowerError, 'untrusted') ||
                       str_contains($lowerError, 'unable to verify')) {
-                $status = 'ssl_expired'; // Treat untrusted as expired
+                $status = 'ssl_issue'; // Treat untrusted as expired
             }
             
-            Log::error('HTTP check failed', [
-                'monitor_id' => $monitor->id,
-                'error' => $errorMessage,
-                'status' => $status,
-            ]);
+            // Only log unexpected errors, not expected SSL certificate issues
+            // Expected SSL errors are already logged to monitor_logs table
+            if ($status !== 'ssl_issue' && $status !== 'ssl_expiring') {
+                Log::error('HTTP check failed', [
+                    'monitor_id' => $monitor->id,
+                    'error' => $errorMessage,
+                    'status' => $status,
+                ]);
+            }
 
             $this->logCheck($monitor, $status, [
                 'error' => $errorMessage,
@@ -220,18 +224,22 @@ class MonitorChecker
             if (str_contains($lowerError, 'certificate has expired') || 
                 str_contains($lowerError, 'certificate expired') ||
                 str_contains($lowerError, 'ssl certificate') && str_contains($lowerError, 'expired')) {
-                $status = 'ssl_expired';
+                $status = 'ssl_issue';
             } elseif (str_contains($lowerError, 'certificate has been revoked') ||
                       str_contains($lowerError, 'certificate revoked') ||
                       str_contains($lowerError, 'revoked certificate')) {
-                $status = 'ssl_expired'; // Treat revoked as expired for now
+                $status = 'ssl_issue'; // Treat revoked as expired for now
             }
             
-            Log::error('HTTP check failed', [
-                'monitor_id' => $monitor->id,
-                'error' => $errorMessage,
-                'status' => $status,
-            ]);
+            // Only log unexpected errors, not expected SSL certificate issues
+            // Expected SSL errors are already logged to monitor_logs table
+            if ($status !== 'ssl_issue' && $status !== 'ssl_expiring') {
+                Log::error('HTTP check failed', [
+                    'monitor_id' => $monitor->id,
+                    'error' => $errorMessage,
+                    'status' => $status,
+                ]);
+            }
 
             $this->logCheck($monitor, $status, [
                 'error' => $errorMessage,

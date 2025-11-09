@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Active/inactive toggle per monitor
 - Extended logging with configurable retention
 - Dashboard widgets:
-  - Devices up/down/SSL expired statistics
+  - Devices up/down/SSL issues statistics
   - Table of devices currently down
   - Uptime graph over time
 - Support for HTTP/HTTPS monitoring (extends Spatie's functionality)

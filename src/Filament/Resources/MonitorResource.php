@@ -149,6 +149,7 @@ class MonitorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
@@ -217,7 +218,7 @@ class MonitorResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'up' => 'success',
                         'down' => 'danger',
-                        'ssl_expired' => 'warning',
+                        'ssl_issue' => 'warning',
                         default => 'secondary',
                     }),
 
@@ -244,7 +245,7 @@ class MonitorResource extends Resource
                     ->options([
                         'up' => 'Up',
                         'down' => 'Down',
-                        'ssl_expired' => 'SSL Expired',
+                        'ssl_issue' => 'SSL Issue',
                     ])
                     ->query(function ($query, array $data) {
                         if (!empty($data['value'])) {

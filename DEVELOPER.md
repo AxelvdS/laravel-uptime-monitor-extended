@@ -69,7 +69,7 @@ The package extends Spatie's `monitors` table with:
 Stores check history:
 
 - `monitor_id` (foreign key) - Reference to monitor
-- `status` (enum) - up, down, ssl_expired, ssl_expiring
+- `status` (enum) - up, down, ssl_issue, ssl_expiring
 - `response_time_ms` (string, nullable) - Response time in milliseconds
 - `error_message` (text, nullable) - Error message if failed
 - `metadata` (json, nullable) - Additional metadata

@@ -191,7 +191,7 @@ $stats = $widget->getData();
 echo "Total: {$stats['total']}\n";
 echo "Up: {$stats['up']}\n";
 echo "Down: {$stats['down']}\n";
-echo "SSL Expired: {$stats['ssl_expired']}\n";
+echo "SSL Issues: {$stats['ssl_issue']}\n";
 echo "Percentage Up: {$stats['percentage_up']}%\n";
 ```
 
@@ -223,7 +223,7 @@ foreach ($data as $point) {
     echo "Time: {$point['time']}\n";
     echo "  Up: {$point['up']}\n";
     echo "  Down: {$point['down']}\n";
-    echo "  SSL Expired: {$point['ssl_expired']}\n";
+    echo "  SSL Issues: {$point['ssl_issue']}\n";
 }
 ```
 

@@ -17,7 +17,7 @@ class DevicesDownTable
                     ->from('monitors_logs')
                     ->groupBy('monitor_id');
             })
-            ->whereIn('status', ['down', 'ssl_expired'])
+            ->whereIn('status', ['down', 'ssl_issue'])
             ->get()
             ->keyBy('monitor_id');
 

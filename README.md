@@ -28,7 +28,7 @@ If you're using Laravel Filament, you also get:
 
 - ✅ **Monitor Resource** - Full CRUD interface for managing monitors
 - ✅ **Dashboard Widgets** - Built-in Filament widgets for monitoring statistics
-  - Devices up/down/SSL expired statistics widget
+  - Devices up/down/SSL issues statistics widget
   - Table of devices currently down widget
   - Uptime graph widget showing trends over time
 - ✅ **Native Filament Experience** - All features work seamlessly within your Filament admin panel
@@ -292,7 +292,7 @@ protected function schedule(Schedule $schedule)
 
 If you're using Filament, the package automatically provides:
 - **Monitor Resource** - Full CRUD interface for managing monitors
-- **Up/Down Stats Widget** - Statistics showing devices up/down/SSL expired
+- **Up/Down Stats Widget** - Statistics showing devices up/down/SSL issues
 - **Devices Down Table Widget** - Table of monitors currently down
 - **Uptime Graph Widget** - Visual graph showing uptime trends over time
 
@@ -305,7 +305,7 @@ For projects without Filament, a simple Blade-based dashboard is available:
 Access the dashboard at: `http://your-app.com/uptime-monitor`
 
 The dashboard provides:
-- Real-time statistics (devices up/down/SSL expired)
+- Real-time statistics (devices up/down/SSL issues)
 - Uptime graph over time
 - Table of devices currently down
 

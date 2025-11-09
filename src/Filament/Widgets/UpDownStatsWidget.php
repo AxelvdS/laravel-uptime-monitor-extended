@@ -31,11 +31,11 @@ class UpDownStatsWidget extends BaseWidget
                 ->color('danger')
                 ->url(MonitorResource::getUrl('index', ['tableFilters' => ['status' => ['value' => 'down']]]))
                 ->openUrlInNewTab(false),
-            Stat::make(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' SSL Expired', $data['ssl_expired'])
-                ->description('Certificates expired')
+            Stat::make(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' SSL Issues', $data['ssl_issue'])
+                ->description('SSL certificate problems')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning')
-                ->url(MonitorResource::getUrl('index', ['tableFilters' => ['status' => ['value' => 'ssl_expired']]]))
+                ->url(MonitorResource::getUrl('index', ['tableFilters' => ['status' => ['value' => 'ssl_issue']]]))
                 ->openUrlInNewTab(false),
         ];
     }

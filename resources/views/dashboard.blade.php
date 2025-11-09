@@ -98,7 +98,7 @@
         }
         .status-badge.up { background: #c6f6d5; color: #22543d; }
         .status-badge.down { background: #fed7d7; color: #742a2a; }
-        .status-badge.ssl_expired { background: #feebc8; color: #7c2d12; }
+        .status-badge.ssl_issue { background: #feebc8; color: #7c2d12; }
         .loading {
             text-align: center;
             padding: 40px;
@@ -158,8 +158,8 @@
                         <div class="value">${data.down}</div>
                     </div>
                     <div class="stat-card ssl">
-                        <h3>SSL Expired</h3>
-                        <div class="value">${data.ssl_expired}</div>
+                        <h3>SSL Issues</h3>
+                        <div class="value">${data.ssl_issue}</div>
                     </div>
                 `;
             } catch (error) {
@@ -183,7 +183,7 @@
                 let tableHTML = '<table><thead><tr><th>ID</th><th>URL/IP</th><th>Type</th><th>Status</th><th>Error</th><th>Last Checked</th></tr></thead><tbody>';
                 
                 data.forEach(device => {
-                    const statusClass = device.status === 'up' ? 'up' : device.status === 'ssl_expired' ? 'ssl_expired' : 'down';
+                    const statusClass = device.status === 'up' ? 'up' : device.status === 'ssl_issue' ? 'ssl_issue' : 'down';
                     const lastChecked = device.last_checked ? new Date(device.last_checked).toLocaleString() : 'Never';
                     
                     tableHTML += `
@@ -238,8 +238,8 @@
                                 tension: 0.4
                             },
                             {
-                                label: 'SSL Expired',
-                                data: data.map(d => d.ssl_expired),
+                                label: 'SSL Issues',
+                                data: data.map(d => d.ssl_issue),
                                 borderColor: '#ed8936',
                                 backgroundColor: 'rgba(237, 137, 54, 0.1)',
                                 tension: 0.4

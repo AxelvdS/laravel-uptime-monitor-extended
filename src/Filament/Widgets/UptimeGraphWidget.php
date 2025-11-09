@@ -36,8 +36,8 @@ class UptimeGraphWidget extends ChartWidget
                     'borderColor' => 'rgb(239, 68, 68)',
                 ],
                 [
-                    'label' => 'SSL Expired',
-                    'data' => array_column($data, 'ssl_expired'),
+                    'label' => 'SSL Issues',
+                    'data' => array_column($data, 'ssl_issue'),
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
                     'borderColor' => 'rgb(245, 158, 11)',
                 ],
