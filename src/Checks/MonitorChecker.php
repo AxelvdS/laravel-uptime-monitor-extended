@@ -83,13 +83,16 @@ class MonitorChecker
      */
     protected function checkTcpPort(Monitor $monitor): array
     {
-        $hostAndPort = $this->extractHostAndPortFromUrl($monitor->url);
+        // Get the raw URL value, ensuring it's a string
+        $url = (string) $monitor->url;
+        
+        $hostAndPort = $this->extractHostAndPortFromUrl($url);
         
         if (!$hostAndPort) {
             return [
                 'success' => false,
                 'status' => 'down',
-                'message' => 'Invalid host:port format (e.g., 192.168.1.1:22 or example.com:3306)',
+                'message' => "Invalid host:port format (e.g., 192.168.1.1:22 or example.com:3306). Got: {$url}",
             ];
         }
 
@@ -260,8 +263,12 @@ class MonitorChecker
      */
     protected function extractIpFromUrl(string $url): ?string
     {
-        // Remove protocol if present
+        // Convert to string if it's an object
+        $url = (string) $url;
+        
+        // Remove protocol if present (http://, https://, or just //)
         $url = preg_replace('#^https?://#', '', $url);
+        $url = preg_replace('#^//+#', '', $url); // Remove leading slashes
         
         // Remove port if present
         $url = preg_replace('#:\d+$#', '', $url);
@@ -282,8 +289,12 @@ class MonitorChecker
      */
     protected function extractHostAndPortFromUrl(string $url): ?array
     {
-        // Remove protocol if present
+        // Convert to string if it's an object
+        $url = (string) $url;
+        
+        // Remove protocol if present (http://, https://, or just //)
         $url = preg_replace('#^https?://#', '', $url);
+        $url = preg_replace('#^//+#', '', $url); // Remove leading slashes (handles // prefix from Spatie's URL object)
         
         // Remove path if present
         $url = preg_replace('#/.*$#', '', $url);
