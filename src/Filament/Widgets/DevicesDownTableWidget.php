@@ -15,9 +15,6 @@ class DevicesDownTableWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $widget = new DevicesDownTable();
-        $data = $widget->getData(10);
-
         return $table
             ->heading('Devices Currently Down')
             ->description('Monitors that are currently down or have SSL issues')
@@ -59,8 +56,13 @@ class DevicesDownTableWidget extends BaseWidget
                     ->getStateUsing(fn (array $record) => $record['last_checked'] ?? null)
                     ->dateTime()
                     ->since(),
-            ])
-            ->data($data);
+            ]);
+    }
+
+    protected function getTableRecords(): array
+    {
+        $widget = new DevicesDownTable();
+        return $widget->getData(10);
     }
 }
 
