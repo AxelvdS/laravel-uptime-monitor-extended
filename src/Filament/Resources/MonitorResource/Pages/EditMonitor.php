@@ -16,5 +16,13 @@ class EditMonitor extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Ensure look_for_string is an empty string if null (Spatie's column is NOT NULL DEFAULT '')
+        $data['look_for_string'] = $data['look_for_string'] ?? '';
+
+        return $data;
+    }
 }
 
