@@ -150,10 +150,8 @@ class MonitorChecker
                         }
                     }
                     
-                    // Check for revoked certificate using OCSP
-                    if ($certInfo && $this->isCertificateRevoked($certInfo, $url)) {
-                        $status = 'ssl_issue'; // Treat revoked as expired
-                    }
+                    // Note: Revoked certificate checking would require full OCSP/CRL implementation
+                    // For now, revoked certificates are detected via connection errors in exception handling
                 } catch (\Exception $e) {
                     // SSL check failed, but HTTP might still be up
                     // If the error mentions revoked, expired, or untrusted, we'll catch it in the exception handler
