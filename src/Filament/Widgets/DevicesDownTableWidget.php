@@ -63,7 +63,7 @@ class DevicesDownTableWidget extends BaseWidget
     public function getTableRecords(): Collection
     {
         $widget = new DevicesDownTable();
-        return collect($widget->getData(10));
+        return Collection::make($widget->getData(10));
     }
 }
 
