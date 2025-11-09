@@ -11,6 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if the monitors table exists before trying to alter it
+        if (!Schema::hasTable('monitors')) {
+            throw new \RuntimeException(
+                'The monitors table does not exist. Please run Spatie\'s Laravel Uptime Monitor migrations first.'
+            );
+        }
+
         Schema::table('monitors', function (Blueprint $table) {
             // Add monitor type (http, https, ping, tcp)
             if (!Schema::hasColumn('monitors', 'monitor_type')) {
