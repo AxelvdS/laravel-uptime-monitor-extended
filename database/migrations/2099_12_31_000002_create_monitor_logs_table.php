@@ -20,7 +20,7 @@ return new class extends Migration
 
         Schema::create('monitors_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('monitor_id');
+            $table->unsignedInteger('monitor_id'); // Match Spatie's monitors.id type (int unsigned)
             $table->enum('status', ['up', 'down', 'ssl_expired', 'ssl_expiring'])->default('up');
             $table->string('response_time_ms')->nullable();
             $table->text('error_message')->nullable();
