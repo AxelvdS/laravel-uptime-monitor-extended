@@ -73,7 +73,7 @@ UPTIME_MONITOR_GRAPH_DATA_POINTS=24
 UPTIME_MONITOR_DASHBOARD_REFRESH=60
 ```
 
-## Step 7: Schedule Commands
+## Step 6: Schedule Commands
 
 Add these commands to your `app/Console/Kernel.php`:
 
@@ -91,7 +91,7 @@ protected function schedule(Schedule $schedule)
 }
 ```
 
-## Step 8: Create Your First Monitor
+## Step 7: Create Your First Monitor
 
 You can create monitors via Artisan command (using Spatie's commands):
 
