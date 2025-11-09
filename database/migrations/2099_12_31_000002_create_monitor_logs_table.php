@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('monitor_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('monitor_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('monitor_id');
+            $table->foreign('monitor_id')->references('id')->on('monitors')->onDelete('cascade');
             $table->enum('status', ['up', 'down', 'ssl_expired', 'ssl_expiring'])->default('up');
             $table->string('response_time_ms')->nullable();
             $table->text('error_message')->nullable();
