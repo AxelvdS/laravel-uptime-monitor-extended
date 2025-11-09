@@ -1,7 +1,7 @@
 # Laravel Uptime Monitor Extended
 
 ![Status](https://img.shields.io/badge/status-stable-green)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.1-blue)
 
 An extended uptime monitoring package for Laravel that builds upon [Spatie's Laravel Uptime Monitor](https://github.com/spatie/laravel-uptime-monitor) with additional features including IP/ping monitoring, per-monitor frequency settings, active/inactive toggles, and built-in dashboard widgets.
 
@@ -164,11 +164,24 @@ return [
         'interval' => env('UPTIME_MONITOR_PING_INTERVAL', 0.2),
     ],
     
+    // Filament configuration (optional)
+    'filament' => [
+        // Navigation label for the Monitor resource
+        'navigation_label' => env('UPTIME_MONITOR_NAVIGATION_LABEL', 'Monitors'),
+        
+        // Optional: Navigation group (set to null or don't set to have no group)
+        'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP') ?: null,
+    ],
+    
+    // Auto-schedule commands (default: true)
+    'auto_schedule' => env('UPTIME_MONITOR_AUTO_SCHEDULE', true),
+    
     // Dashboard configuration
     'dashboard' => [
         'enabled' => env('UPTIME_MONITOR_DASHBOARD_ENABLED', true),
         'graph_data_points' => env('UPTIME_MONITOR_GRAPH_DATA_POINTS', 24),
         'refresh_interval' => env('UPTIME_MONITOR_DASHBOARD_REFRESH', 60),
+        'graph_height' => env('UPTIME_MONITOR_GRAPH_HEIGHT', 200), // pixels
     ],
 ];
 ```
@@ -344,21 +357,31 @@ $logs = MonitorLog::where('monitor_id', 1)
 - **`https`** - HTTPS monitoring with SSL certificate checks
 - **`http`** - HTTP monitoring (no SSL checks)
 - **`ping`** - ICMP ping monitoring for IP addresses
+- **`tcp`** - TCP port monitoring (e.g., `192.168.1.1:22` or `example.com:3306`)
 
 ## Response Checking
 
-For HTTP/HTTPS monitors, you can check for specific content in responses:
+For HTTP/HTTPS monitors, you can check for specific content in responses using the `look_for_string` field:
 
 ```php
 Monitor::create([
     'url' => 'https://api.example.com/health',
     'monitor_type' => 'https',
-    'look_for_string' => '{"status":"ok"}', // Spatie's feature
+    'look_for_string' => '{"status":"ok"}', // Check for this string in the response body
     'frequency_minutes' => 5,
 ]);
 ```
 
-For more advanced response checking, you can create custom response checkers as described in [Spatie's documentation](https://spatie.be/docs/laravel-uptime-monitor/v3/advanced-usage/sending-and-verifying-a-payload).
+**How it works:**
+- If `look_for_string` is set, after a successful HTTP response (status 200-399), the package checks if the string exists in the response body
+- If the string is **not found**, the monitor is marked as `down` with the error message: "Required string '...' not found in response"
+- If the string **is found**, the monitor remains `up`
+- This is useful for verifying that login pages, API responses, or specific content is present on the page
+
+**Example use cases:**
+- Verify a login page contains "Welcome" or "Dashboard"
+- Check that an API endpoint returns a specific JSON key
+- Ensure a maintenance page doesn't appear (check for absence of "Maintenance Mode")
 
 ## Log Retention
 

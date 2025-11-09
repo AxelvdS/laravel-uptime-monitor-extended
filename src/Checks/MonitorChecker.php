@@ -135,6 +135,16 @@ class MonitorChecker
             $statusCode = $response->getStatusCode();
             $isUp = $statusCode >= 200 && $statusCode < 400;
             
+            // Check for look_for_string if specified
+            $stringNotFound = false;
+            if ($isUp && !empty($monitor->look_for_string)) {
+                $responseBody = $response->getBody()->getContents();
+                if (strpos($responseBody, $monitor->look_for_string) === false) {
+                    $isUp = false;
+                    $stringNotFound = true;
+                }
+            }
+            
             $status = $isUp ? 'up' : 'down';
             
             // Check SSL certificate if HTTPS
@@ -158,17 +168,27 @@ class MonitorChecker
                 }
             }
 
+            // Determine error message
+            $errorMessage = null;
+            if (!$isUp) {
+                if ($stringNotFound) {
+                    $errorMessage = "Required string '{$monitor->look_for_string}' not found in response";
+                } elseif ($statusCode >= 400) {
+                    $errorMessage = "HTTP {$statusCode}";
+                }
+            }
+
             // Log the check
             $this->logCheck($monitor, $status, [
                 'response_time_ms' => round($responseTime, 2),
-                'error' => $isUp ? null : "HTTP {$statusCode}",
+                'error' => $errorMessage,
             ]);
 
             return [
                 'success' => $isUp && $status !== 'ssl_issue',
                 'status' => $status,
                 'response_time_ms' => round($responseTime, 2),
-                'message' => $isUp ? 'HTTP check successful' : "HTTP check failed (Status: {$statusCode})",
+                'message' => $isUp ? 'HTTP check successful' : ($stringNotFound ? "Required string not found in response" : "HTTP check failed (Status: {$statusCode})"),
             ];
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $errorMessage = $e->getMessage();

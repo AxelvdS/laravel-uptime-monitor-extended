@@ -72,7 +72,8 @@ return [
     */
     'filament' => [
         'navigation_label' => env('UPTIME_MONITOR_NAVIGATION_LABEL', 'Monitors'),
-        'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP', 'Monitoring'),
+        // Optional: Set to null or don't set to have no navigation group
+        'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP') ?: null,
     ],
 
     /*

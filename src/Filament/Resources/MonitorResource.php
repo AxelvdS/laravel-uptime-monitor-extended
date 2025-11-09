@@ -23,7 +23,8 @@ class MonitorResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return config('uptime-monitor-extended.filament.navigation_group', 'Monitoring');
+        // Return null if not configured, otherwise use the config value
+        return config('uptime-monitor-extended.filament.navigation_group');
     }
 
     public static function getLabel(): string
@@ -115,7 +116,7 @@ class MonitorResource extends Resource
                         'ping' => 'Ping (ICMP)',
                         'tcp' => 'TCP Port',
                     ])
-                    // ->default('https')
+                    ->default('https')
                     ->required()
                     ->helperText('Select the type of monitoring to perform. For TCP Port, use format: host:port (e.g., 192.168.1.1:22)'),
 
