@@ -60,5 +60,18 @@ return [
         'graph_data_points' => env('UPTIME_MONITOR_GRAPH_DATA_POINTS', 24),
         'refresh_interval' => env('UPTIME_MONITOR_DASHBOARD_REFRESH', 60), // seconds
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filament Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Filament admin panel integration.
+    |
+    */
+    'filament' => [
+        'navigation_label' => env('UPTIME_MONITOR_NAVIGATION_LABEL', 'Monitors'),
+        'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP', 'Monitoring'),
+    ],
 ];
 

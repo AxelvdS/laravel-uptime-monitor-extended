@@ -38,6 +38,7 @@ class DevicesDownTableWidget extends BaseWidget
                         'https' => 'primary',
                         'http' => 'success',
                         'ping' => 'warning',
+                        'tcp' => 'info',
                         default => 'secondary',
                     }),
                 Tables\Columns\TextColumn::make('status')

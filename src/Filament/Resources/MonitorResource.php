@@ -16,7 +16,15 @@ class MonitorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
 
-    protected static ?string $navigationGroup = 'Monitoring';
+    public static function getNavigationLabel(): string
+    {
+        return config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return config('uptime-monitor-extended.filament.navigation_group', 'Monitoring');
+    }
 
     public static function form(Form $form): Form
     {
@@ -36,9 +44,9 @@ class MonitorResource extends Resource
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('url')
-                    ->label('URL or IP Address')
+                    ->label('URL, IP Address, or Host:Port')
                     ->required()
-                    ->helperText('Enter a URL (http:// or https://) or IP address for ping monitoring')
+                    ->helperText('Enter a URL (http:// or https://), IP address for ping, or host:port for TCP (e.g., 192.168.1.1:22)')
                     ->maxLength(255),
 
                 Forms\Components\Select::make('monitor_type')
@@ -47,10 +55,11 @@ class MonitorResource extends Resource
                         'https' => 'HTTPS',
                         'http' => 'HTTP',
                         'ping' => 'Ping (ICMP)',
+                        'tcp' => 'TCP Port',
                     ])
                     ->default('https')
                     ->required()
-                    ->helperText('Select the type of monitoring to perform'),
+                    ->helperText('Select the type of monitoring to perform. For TCP Port, use format: host:port (e.g., 192.168.1.1:22)'),
 
                 Forms\Components\TextInput::make('frequency_minutes')
                     ->label('Check Frequency (minutes)')
@@ -106,6 +115,7 @@ class MonitorResource extends Resource
                         'https' => 'primary',
                         'http' => 'success',
                         'ping' => 'warning',
+                        'tcp' => 'info',
                         default => 'secondary',
                     })
                     ->sortable(),
@@ -154,6 +164,7 @@ class MonitorResource extends Resource
                         'https' => 'HTTPS',
                         'http' => 'HTTP',
                         'ping' => 'Ping',
+                        'tcp' => 'TCP Port',
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_active')

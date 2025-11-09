@@ -3,6 +3,7 @@
 namespace AxelvdS\UptimeMonitorExtended\Checks;
 
 use AxelvdS\UptimeMonitorExtended\Checks\PingCheck;
+use AxelvdS\UptimeMonitorExtended\Checks\TcpPortCheck;
 use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
 use Spatie\UptimeMonitor\Models\Monitor;
 use Illuminate\Support\Facades\Log;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 class MonitorChecker
 {
     protected PingCheck $pingCheck;
+    protected TcpPortCheck $tcpPortCheck;
 
     public function __construct()
     {
@@ -17,6 +19,9 @@ class MonitorChecker
             config('uptime-monitor-extended.ping.timeout', 3),
             config('uptime-monitor-extended.ping.count', 1),
             config('uptime-monitor-extended.ping.interval', 0.2)
+        );
+        $this->tcpPortCheck = new TcpPortCheck(
+            config('uptime-monitor-extended.ping.timeout', 3)
         );
     }
 
@@ -37,6 +42,7 @@ class MonitorChecker
 
         return match ($monitorType) {
             'ping' => $this->checkPing($monitor),
+            'tcp' => $this->checkTcpPort($monitor),
             'http', 'https' => $this->checkHttp($monitor),
             default => $this->checkHttp($monitor), // Default to HTTP check
         };
@@ -69,6 +75,36 @@ class MonitorChecker
             'status' => $status,
             'response_time_ms' => $result['response_time_ms'],
             'message' => $result['error'] ?? 'Ping successful',
+        ];
+    }
+
+    /**
+     * Check monitor via TCP port.
+     */
+    protected function checkTcpPort(Monitor $monitor): array
+    {
+        $hostAndPort = $this->extractHostAndPortFromUrl($monitor->url);
+        
+        if (!$hostAndPort) {
+            return [
+                'success' => false,
+                'status' => 'down',
+                'message' => 'Invalid host:port format (e.g., 192.168.1.1:22 or example.com:3306)',
+            ];
+        }
+
+        $result = $this->tcpPortCheck->check($hostAndPort['host'], $hostAndPort['port']);
+
+        $status = $result['success'] ? 'up' : 'down';
+
+        // Log the check
+        $this->logCheck($monitor, $status, $result);
+
+        return [
+            'success' => $result['success'],
+            'status' => $status,
+            'response_time_ms' => $result['response_time_ms'],
+            'message' => $result['error'] ?? "Port {$hostAndPort['port']} is open",
         ];
     }
 
@@ -128,6 +164,11 @@ class MonitorChecker
      */
     protected function detectMonitorType(string $url): string
     {
+        // Check for TCP port format (host:port)
+        if ($this->extractHostAndPortFromUrl($url)) {
+            return 'tcp';
+        }
+
         if (filter_var($url, FILTER_VALIDATE_IP)) {
             return 'ping';
         }
@@ -161,6 +202,36 @@ class MonitorChecker
         // Validate IP
         if (filter_var($url, FILTER_VALIDATE_IP)) {
             return $url;
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract host and port from URL.
+     */
+    protected function extractHostAndPortFromUrl(string $url): ?array
+    {
+        // Remove protocol if present
+        $url = preg_replace('#^https?://#', '', $url);
+        
+        // Remove path if present
+        $url = preg_replace('#/.*$#', '', $url);
+
+        // Check if port is specified
+        if (preg_match('#^(.+):(\d+)$#', $url, $matches)) {
+            $host = $matches[1];
+            $port = (int) $matches[2];
+            
+            // Validate port range
+            if ($port < 1 || $port > 65535) {
+                return null;
+            }
+            
+            return [
+                'host' => $host,
+                'port' => $port,
+            ];
         }
 
         return null;
