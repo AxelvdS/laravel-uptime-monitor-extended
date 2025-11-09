@@ -24,11 +24,11 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register Livewire components (widgets) so they can be discovered
+        // Discover Livewire components (widgets) in the package namespace
         if (class_exists(\Livewire\Livewire::class)) {
-            \Livewire\Livewire::component('axelvd-s.uptime-monitor-extended.filament.widgets.up-down-stats-widget', UpDownStatsWidget::class);
-            \Livewire\Livewire::component('axelvd-s.uptime-monitor-extended.filament.widgets.devices-down-table-widget', DevicesDownTableWidget::class);
-            \Livewire\Livewire::component('axelvd-s.uptime-monitor-extended.filament.widgets.uptime-graph-widget', UptimeGraphWidget::class);
+            \Livewire\Livewire::component(UpDownStatsWidget::class);
+            \Livewire\Livewire::component(DevicesDownTableWidget::class);
+            \Livewire\Livewire::component(UptimeGraphWidget::class);
         }
 
         // Auto-register resources and widgets for all Filament panels
