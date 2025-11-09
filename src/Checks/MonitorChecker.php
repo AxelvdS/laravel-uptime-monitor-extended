@@ -193,10 +193,10 @@ class MonitorChecker
                 $status = 'ssl_issue';
             }
             
-            // Only log unexpected errors, not expected SSL certificate issues
-            // Expected SSL errors are already logged to monitor_logs table
-            // Truly down sites (DNS errors, connection timeouts, etc.) should still be logged
-            if ($status !== 'ssl_issue' && $status !== 'ssl_expiring') {
+            // Only log unexpected errors, not expected statuses
+            // Expected statuses (ssl_issue, ssl_expiring, down) are already logged to monitor_logs table
+            // Only log truly unexpected errors that don't have a clear status
+            if (!in_array($status, ['ssl_issue', 'ssl_expiring', 'down'])) {
                 Log::error('HTTP check failed', [
                     'monitor_id' => $monitor->id,
                     'error' => $errorMessage,
@@ -237,10 +237,10 @@ class MonitorChecker
                 $status = 'ssl_issue';
             }
             
-            // Only log unexpected errors, not expected SSL certificate issues
-            // Expected SSL errors are already logged to monitor_logs table
-            // Truly down sites (DNS errors, connection timeouts, etc.) should still be logged
-            if ($status !== 'ssl_issue' && $status !== 'ssl_expiring') {
+            // Only log unexpected errors, not expected statuses
+            // Expected statuses (ssl_issue, ssl_expiring, down) are already logged to monitor_logs table
+            // Only log truly unexpected errors that don't have a clear status
+            if (!in_array($status, ['ssl_issue', 'ssl_expiring', 'down'])) {
                 Log::error('HTTP check failed', [
                     'monitor_id' => $monitor->id,
                     'error' => $errorMessage,
