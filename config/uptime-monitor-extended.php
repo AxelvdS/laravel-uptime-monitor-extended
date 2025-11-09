@@ -73,5 +73,16 @@ return [
         'navigation_label' => env('UPTIME_MONITOR_NAVIGATION_LABEL', 'Monitors'),
         'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP', 'Monitoring'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Schedule Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Automatically register scheduled commands in the Laravel scheduler.
+    | Set to false if you want to manually register them in app/Console/Kernel.php
+    |
+    */
+    'auto_schedule' => env('UPTIME_MONITOR_AUTO_SCHEDULE', true),
 ];
 
