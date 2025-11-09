@@ -9,7 +9,7 @@ class UptimeGraphWidget extends ChartWidget
 {
     protected static ?int $sort = 3;
 
-    public static function getHeading(): ?string
+    public function getHeading(): ?string
     {
         return config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' Status Over Time';
     }

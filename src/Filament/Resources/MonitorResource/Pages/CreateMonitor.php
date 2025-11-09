@@ -11,7 +11,12 @@ class CreateMonitor extends CreateRecord
 
     public function getTitle(): string
     {
-        return 'Create ' . config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+        $label = config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
+        // Convert plural to singular for page title
+        if (str_ends_with($label, 's') && strlen($label) > 1) {
+            $label = substr($label, 0, -1);
+        }
+        return 'Create ' . $label;
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

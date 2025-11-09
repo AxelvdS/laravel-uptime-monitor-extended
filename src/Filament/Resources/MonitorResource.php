@@ -28,7 +28,13 @@ class MonitorResource extends Resource
 
     public static function getLabel(): string
     {
-        return config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+        $label = config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
+        // Convert plural to singular (simple: remove trailing 's')
+        // This handles cases like "Monitors" -> "Monitor", "Uptime Monitors" -> "Uptime Monitor"
+        if (str_ends_with($label, 's') && strlen($label) > 1) {
+            return substr($label, 0, -1);
+        }
+        return $label;
     }
 
     public static function getPluralLabel(): string

@@ -12,7 +12,12 @@ class EditMonitor extends EditRecord
 
     public function getTitle(): string
     {
-        return 'Edit ' . config('uptime-monitor-extended.filament.navigation_label', 'Monitor');
+        $label = config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
+        // Convert plural to singular for page title
+        if (str_ends_with($label, 's') && strlen($label) > 1) {
+            $label = substr($label, 0, -1);
+        }
+        return 'Edit ' . $label;
     }
 
     protected function getHeaderActions(): array
