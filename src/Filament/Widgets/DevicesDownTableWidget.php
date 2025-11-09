@@ -19,8 +19,8 @@ class DevicesDownTableWidget extends BaseWidget
     {
         return $table
             ->query($this->query())
-            ->heading('Devices Currently Down')
-            ->description('Monitors that are currently down or have SSL issues')
+            ->heading(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' Currently Down')
+            ->description(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' that are currently down or have SSL issues')
             ->defaultSort('last_checked', 'desc')
             ->actions([]) // Disable actions since we're using arrays, not Models
             ->bulkActions([]) // Disable bulk actions

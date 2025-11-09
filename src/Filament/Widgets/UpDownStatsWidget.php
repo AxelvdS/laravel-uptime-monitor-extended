@@ -19,19 +19,19 @@ class UpDownStatsWidget extends BaseWidget
         $data = $widget->getData();
 
         return [
-            Stat::make('Devices Up', $data['up'])
+            Stat::make(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' Up', $data['up'])
                 ->description($data['percentage_up'] . '% of ' . $data['total'] . ' total')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->url(MonitorResource::getUrl('index', ['tableFilters' => ['status' => ['value' => 'up']]]))
                 ->openUrlInNewTab(false),
-            Stat::make('Devices Down', $data['down'])
+            Stat::make(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' Down', $data['down'])
                 ->description('Requires attention')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('danger')
                 ->url(MonitorResource::getUrl('index', ['tableFilters' => ['status' => ['value' => 'down']]]))
                 ->openUrlInNewTab(false),
-            Stat::make('SSL Expired', $data['ssl_expired'])
+            Stat::make(config('uptime-monitor-extended.filament.navigation_label', 'Monitors') . ' SSL Expired', $data['ssl_expired'])
                 ->description('Certificates expired')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning')

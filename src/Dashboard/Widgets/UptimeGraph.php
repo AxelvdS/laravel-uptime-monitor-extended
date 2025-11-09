@@ -13,15 +13,24 @@ class UptimeGraph
         $startDate = Carbon::now()->subHours($hours);
         $endDate = Carbon::now();
 
-        // Group logs by time intervals
-        $logs = MonitorLog::whereBetween('checked_at', [$startDate, $endDate])
+        // Get the latest log entry for each monitor in each time slot
+        // This ensures we count unique monitors, not log entries
+        $latestLogs = MonitorLog::whereBetween('checked_at', [$startDate, $endDate])
             ->select(
                 DB::raw('DATE_FORMAT(checked_at, "%Y-%m-%d %H:00:00") as time_slot'),
-                'status',
-                DB::raw('COUNT(*) as count')
+                'monitor_id',
+                'status'
             )
-            ->groupBy('time_slot', 'status')
-            ->orderBy('time_slot')
+            ->whereIn('id', function ($query) use ($startDate, $endDate) {
+                // Get the latest log ID for each monitor in each hour
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('monitors_logs')
+                    ->whereBetween('checked_at', [$startDate, $endDate])
+                    ->groupBy(
+                        DB::raw('DATE_FORMAT(checked_at, "%Y-%m-%d %H:00:00")'),
+                        'monitor_id'
+                    );
+            })
             ->get();
 
         // Initialize data structure
@@ -39,11 +48,11 @@ class UptimeGraph
             $current->addHours(1);
         }
 
-        // Fill in actual data
-        foreach ($logs as $log) {
+        // Count unique monitors by status for each time slot
+        foreach ($latestLogs as $log) {
             $timeSlot = $log->time_slot;
-            if (isset($data[$timeSlot])) {
-                $data[$timeSlot][$log->status] = (int) $log->count;
+            if (isset($data[$timeSlot]) && isset($data[$timeSlot][$log->status])) {
+                $data[$timeSlot][$log->status]++;
             }
         }
 

@@ -59,6 +59,7 @@ return [
         'enabled' => env('UPTIME_MONITOR_DASHBOARD_ENABLED', true),
         'graph_data_points' => env('UPTIME_MONITOR_GRAPH_DATA_POINTS', 24),
         'refresh_interval' => env('UPTIME_MONITOR_DASHBOARD_REFRESH', 60), // seconds
+        'graph_height' => env('UPTIME_MONITOR_GRAPH_HEIGHT', 200), // pixels
     ],
 
     /*
