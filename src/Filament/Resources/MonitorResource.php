@@ -161,10 +161,14 @@ class MonitorResource extends Resource
                     ->copyable()
                     ->formatStateUsing(function ($state): string {
                         // Convert URL object to string if needed
-                        if (is_object($state) && method_exists($state, '__toString')) {
-                            return (string) $state;
-                        }
-                        return (string) $state;
+                        $url = is_object($state) && method_exists($state, '__toString') 
+                            ? (string) $state 
+                            : (string) $state;
+                        
+                        // Remove // prefix that Spatie's URL object adds
+                        $url = preg_replace('#^//+#', '', $url);
+                        
+                        return $url;
                     }),
 
                 Tables\Columns\TextColumn::make('monitor_type')
