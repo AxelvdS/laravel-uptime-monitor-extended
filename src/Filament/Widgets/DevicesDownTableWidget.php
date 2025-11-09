@@ -30,6 +30,10 @@ class DevicesDownTableWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Name')
+                    ->searchable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('url')
                     ->label('URL/IP')
                     ->formatStateUsing(function ($state) {
@@ -125,6 +129,7 @@ class DevicesDownTableWidget extends BaseWidget
             }
             
             // Add custom attributes from DevicesDownTable data
+            $monitor->setAttribute('name', $item['name'] ?? null);
             $monitor->setAttribute('status', $item['status'] ?? null);
             $monitor->setAttribute('error_message', $item['error_message'] ?? null);
             $monitor->setAttribute('last_checked', $item['last_checked'] ?? null);

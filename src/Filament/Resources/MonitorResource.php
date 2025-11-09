@@ -281,13 +281,14 @@ class MonitorResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (Monitor $record) => MonitorResource::getUrl('view', ['record' => $record]));
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\MonitorLogsRelationManager::class,
         ];
     }
 
@@ -297,6 +298,7 @@ class MonitorResource extends Resource
             'index' => Pages\ListMonitors::route('/'),
             'create' => Pages\CreateMonitor::route('/create'),
             'edit' => Pages\EditMonitor::route('/{record}/edit'),
+            'view' => Pages\ViewMonitor::route('/{record}'),
         ];
     }
 }
