@@ -25,6 +25,7 @@ class DevicesDownTableWidget extends BaseWidget
             ->actions([]) // Disable actions since we're using arrays, not Models
             ->bulkActions([]) // Disable bulk actions
             ->recordAction(null) // Explicitly disable record action
+            ->recordUrl(null) // Disable record URLs
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
@@ -88,12 +89,5 @@ class DevicesDownTableWidget extends BaseWidget
         return Collection::make($widget->getData(10));
     }
 
-    /**
-     * Override to prevent Filament from trying to get record actions on arrays.
-     */
-    protected function getTableRecordActionUsing(): ?\Closure
-    {
-        return null;
-    }
 }
 
