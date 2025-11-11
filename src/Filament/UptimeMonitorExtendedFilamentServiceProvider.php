@@ -3,6 +3,7 @@
 namespace AxelvdS\UptimeMonitorExtended\Filament;
 
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\RelationManagers\MonitorLogsRelationManager;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\DevicesDownTableWidget;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\UpDownStatsWidget;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\UptimeGraphWidget;
@@ -16,11 +17,12 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register Livewire components (widgets) early in register() so they're available when needed
+        // Register Livewire components (widgets and relation managers) early in register() so they're available when needed
         if (class_exists(\Livewire\Livewire::class)) {
             \Livewire\Livewire::component(UpDownStatsWidget::class);
             \Livewire\Livewire::component(DevicesDownTableWidget::class);
             \Livewire\Livewire::component(UptimeGraphWidget::class);
+            \Livewire\Livewire::component(MonitorLogsRelationManager::class);
         }
     }
 
