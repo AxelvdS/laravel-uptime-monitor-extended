@@ -17,6 +17,14 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
             __DIR__ . '/../config/uptime-monitor-extended.php',
             'uptime-monitor-extended'
         );
+
+        // Register Livewire components early (before package discovery)
+        // This ensures they're available when Filament tries to discover them
+        if (class_exists(\Livewire\Livewire::class)) {
+            \Livewire\Livewire::component(
+                \AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager::class
+            );
+        }
     }
 
     /**
