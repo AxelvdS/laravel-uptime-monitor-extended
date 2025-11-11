@@ -1,6 +1,6 @@
 <?php
 
-namespace AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\RelationManagers;
+namespace AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;

@@ -3,7 +3,7 @@
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources;
 
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
-use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\RelationManagers\MonitorLogsRelationManager;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;

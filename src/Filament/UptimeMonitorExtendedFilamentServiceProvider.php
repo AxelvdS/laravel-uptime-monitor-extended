@@ -3,7 +3,7 @@
 namespace AxelvdS\UptimeMonitorExtended\Filament;
 
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource;
-use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\RelationManagers\MonitorLogsRelationManager;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\DevicesDownTableWidget;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\UpDownStatsWidget;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\UptimeGraphWidget;
