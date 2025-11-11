@@ -3,6 +3,7 @@
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources;
 
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\RelationManagers\MonitorLogsRelationManager;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -163,10 +164,9 @@ class MonitorResource extends Resource
                     ->weight('bold'),
 
                 Tables\Columns\TextColumn::make('url')
-                    ->label('URL/IP')
+                    ->label('Address')
                     ->searchable()
                     ->sortable()
-                    ->copyable()
                     ->formatStateUsing(function ($state): string {
                         // Convert URL object to string if needed
                         $url = is_object($state) && method_exists($state, '__toString') 
@@ -289,7 +289,7 @@ class MonitorResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\MonitorLogsRelationManager::class,
+            MonitorLogsRelationManager::class,
         ];
     }
 
