@@ -14,8 +14,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Axel van der Smagt",
-            "email": "-"
+            "name": "Axel van der Smagt"
         }
     ],
     "require": {
