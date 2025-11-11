@@ -18,17 +18,22 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
             'uptime-monitor-extended'
         );
 
-        // Register Livewire components early (before package discovery)
-        // This ensures they're available when Filament tries to discover them
+        // Register Livewire components immediately in register() to ensure they're available
+        // This must happen before Filament's package discovery runs
         if (class_exists(\Livewire\Livewire::class)) {
-            try {
-                $relationManagerClass = \AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager::class;
-                // Ensure class is loaded before registering
-                if (class_exists($relationManagerClass, false) || class_exists($relationManagerClass)) {
+            // Force load the relation manager class file
+            $relationManagerFile = __DIR__ . '/Filament/Resources/RelationManagers/MonitorLogsRelationManager.php';
+            if (file_exists($relationManagerFile)) {
+                require_once $relationManagerFile;
+            }
+            
+            $relationManagerClass = \AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager::class;
+            if (class_exists($relationManagerClass)) {
+                try {
                     \Livewire\Livewire::component($relationManagerClass);
+                } catch (\Throwable $e) {
+                    // Ignore if already registered or other error
                 }
-            } catch (\Throwable $e) {
-                // Silently fail if class doesn't exist yet - it will be registered later
             }
         }
     }

@@ -23,9 +23,19 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
             \Livewire\Livewire::component(DevicesDownTableWidget::class);
             \Livewire\Livewire::component(UptimeGraphWidget::class);
             
-            // Register relation manager if class exists
+            // Register relation manager immediately
+            // Force load the class file to ensure it's available
+            $relationManagerFile = __DIR__ . '/Resources/RelationManagers/MonitorLogsRelationManager.php';
+            if (file_exists($relationManagerFile)) {
+                require_once $relationManagerFile;
+            }
+            
             if (class_exists(MonitorLogsRelationManager::class)) {
-                \Livewire\Livewire::component(MonitorLogsRelationManager::class);
+                try {
+                    \Livewire\Livewire::component(MonitorLogsRelationManager::class);
+                } catch (\Throwable $e) {
+                    // Ignore if already registered
+                }
             }
         }
     }
