@@ -22,7 +22,11 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
             \Livewire\Livewire::component(UpDownStatsWidget::class);
             \Livewire\Livewire::component(DevicesDownTableWidget::class);
             \Livewire\Livewire::component(UptimeGraphWidget::class);
-            \Livewire\Livewire::component(MonitorLogsRelationManager::class);
+            
+            // Register relation manager if class exists
+            if (class_exists(MonitorLogsRelationManager::class)) {
+                \Livewire\Livewire::component(MonitorLogsRelationManager::class);
+            }
         }
     }
 
