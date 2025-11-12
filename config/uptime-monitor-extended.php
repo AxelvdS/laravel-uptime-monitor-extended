@@ -74,6 +74,20 @@ return [
         'navigation_label' => env('UPTIME_MONITOR_NAVIGATION_LABEL', 'Monitors'),
         // Optional: Set to null or don't set to have no navigation group
         'navigation_group' => env('UPTIME_MONITOR_NAVIGATION_GROUP') ?: null,
+        // Panels to register resources and widgets for. Set to null to register for all panels.
+        // Default: ['app'] - only register for the 'app' panel
+        // To register for multiple panels, set UPTIME_MONITOR_PANELS=app,admin in .env
+        // To register for all panels, set UPTIME_MONITOR_PANELS=all in .env
+        'panels' => (function () {
+            $panels = env('UPTIME_MONITOR_PANELS');
+            if ($panels === null || $panels === '') {
+                return ['app']; // Default to 'app' panel only
+            }
+            if (strtolower($panels) === 'null' || strtolower($panels) === 'all') {
+                return null; // Register for all panels
+            }
+            return explode(',', $panels);
+        })(),
     ],
 
     /*

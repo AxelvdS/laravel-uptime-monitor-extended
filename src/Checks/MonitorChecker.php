@@ -197,7 +197,22 @@ class MonitorChecker
             // Check for SSL errors FIRST - if it contains 'ssl' and any SSL-related keywords, it's an SSL issue
             $lowerError = strtolower($errorMessage);
             
-            if (str_contains($lowerError, 'ssl') && (
+            // More comprehensive SSL error detection
+            // Check if it's an SSL-related error (cURL error 60, SSL certificate, etc.)
+            $isSslError = str_contains($lowerError, 'ssl') || 
+                         str_contains($lowerError, 'certificate') ||
+                         str_contains($lowerError, 'tls') ||
+                         str_contains($lowerError, 'curl error 60') ||
+                         str_contains($lowerError, 'curl error 51') ||
+                         str_contains($lowerError, 'curl error 35') ||
+                         preg_match('/curl error \d+.*ssl/i', $errorMessage) ||
+                         preg_match('/curl error \d+.*certificate/i', $errorMessage);
+            
+            // For HTTPS URLs, if we detect any SSL-related error, mark as ssl_issue
+            // This is a fallback to catch SSL errors that don't match specific patterns
+            $isHttps = str_starts_with((string) $monitor->url, 'https://');
+            
+            if ($isSslError && (
                       str_contains($lowerError, 'hostname') ||
                       str_contains($lowerError, 'subject name') ||
                       str_contains($lowerError, 'certificate problem') ||
@@ -209,7 +224,12 @@ class MonitorChecker
                       str_contains($lowerError, 'self signed certificate') ||
                       str_contains($lowerError, 'self-signed') ||
                       str_contains($lowerError, 'untrusted') ||
-                      str_contains($lowerError, 'unable to verify'))) {
+                      str_contains($lowerError, 'unable to verify') ||
+                      str_contains($lowerError, 'verify the certificate') ||
+                      str_contains($lowerError, 'certificate verify failed') ||
+                      str_contains($lowerError, 'peer certificate') ||
+                      // Fallback: If it's an HTTPS URL and we detect SSL-related keywords, mark as SSL issue
+                      ($isHttps && (str_contains($lowerError, 'ssl') || str_contains($lowerError, 'certificate'))))) {
                 $status = 'ssl_issue';
             }
             
@@ -241,7 +261,20 @@ class MonitorChecker
             // Check SSL errors FIRST before defaulting to 'down'
             $lowerError = strtolower($errorMessage);
             
-            if (str_contains($lowerError, 'ssl') && (
+            // More comprehensive SSL error detection
+            $isSslError = str_contains($lowerError, 'ssl') || 
+                         str_contains($lowerError, 'certificate') ||
+                         str_contains($lowerError, 'tls') ||
+                         str_contains($lowerError, 'curl error 60') ||
+                         str_contains($lowerError, 'curl error 51') ||
+                         str_contains($lowerError, 'curl error 35') ||
+                         preg_match('/curl error \d+.*ssl/i', $errorMessage) ||
+                         preg_match('/curl error \d+.*certificate/i', $errorMessage);
+            
+            // For HTTPS URLs, if we detect any SSL-related error, mark as ssl_issue
+            $isHttps = str_starts_with((string) $monitor->url, 'https://');
+            
+            if ($isSslError && (
                       str_contains($lowerError, 'hostname') ||
                       str_contains($lowerError, 'subject name') ||
                       str_contains($lowerError, 'certificate problem') ||
@@ -253,7 +286,12 @@ class MonitorChecker
                       str_contains($lowerError, 'self signed certificate') ||
                       str_contains($lowerError, 'self-signed') ||
                       str_contains($lowerError, 'untrusted') ||
-                      str_contains($lowerError, 'unable to verify'))) {
+                      str_contains($lowerError, 'unable to verify') ||
+                      str_contains($lowerError, 'verify the certificate') ||
+                      str_contains($lowerError, 'certificate verify failed') ||
+                      str_contains($lowerError, 'peer certificate') ||
+                      // Fallback: If it's an HTTPS URL and we detect SSL-related keywords, mark as SSL issue
+                      ($isHttps && (str_contains($lowerError, 'ssl') || str_contains($lowerError, 'certificate'))))) {
                 $status = 'ssl_issue';
             }
             

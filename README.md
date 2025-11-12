@@ -1,7 +1,7 @@
 # Laravel Uptime Monitor Extended
 
 ![Status](https://img.shields.io/badge/status-stable-green)
-![Version](https://img.shields.io/badge/version-1.1.1-blue)
+![Version](https://img.shields.io/badge/version-1.1.10-blue)
 
 An extended uptime monitoring package for Laravel that builds upon [Spatie's Laravel Uptime Monitor](https://github.com/spatie/laravel-uptime-monitor) with additional features including IP/ping monitoring, per-monitor frequency settings, active/inactive toggles, and built-in dashboard widgets.
 

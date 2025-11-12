@@ -84,7 +84,21 @@ class CheckMonitorsExtended extends Command
                 return 1;
             }
         } catch (\Exception $e) {
+            // Ensure we log the error even if check() fails completely
+            \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::create([
+                'monitor_id' => $monitor->id,
+                'status' => 'down',
+                'error_message' => $e->getMessage(),
+                'checked_at' => now(),
+            ]);
+            
             $this->error("  ✗ Error: {$e->getMessage()}");
+            \Illuminate\Support\Facades\Log::error('Monitor check failed with exception', [
+                'monitor_id' => $monitor->id,
+                'url' => $monitor->url,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return 1;
         }
     }

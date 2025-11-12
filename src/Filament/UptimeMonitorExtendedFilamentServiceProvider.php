@@ -45,7 +45,8 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Auto-register resources and widgets for all Filament panels
+        // Auto-register resources and widgets for configured Filament panels
+        // See config('uptime-monitor-extended.filament.panels') to control which panels
         if (class_exists(\Filament\Facades\Filament::class)) {
             \Filament\Facades\Filament::serving(function () {
                 // Get all registered panels and register resources/widgets for each
@@ -67,6 +68,17 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
      */
     public static function registerForPanel(Panel $panel): void
     {
+        // Check if there's a config specifying which panels to register for
+        $allowedPanels = config('uptime-monitor-extended.filament.panels');
+        
+        // If config is null, register for all panels (backward compatibility)
+        if ($allowedPanels === null) {
+            // Register for all panels
+        } elseif (is_array($allowedPanels) && !in_array($panel->getId(), $allowedPanels)) {
+            // Config specifies specific panels, and this panel is not in the list
+            return;
+        }
+        
         $panel
             ->resources([
                 MonitorResource::class,
