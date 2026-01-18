@@ -42,6 +42,10 @@ This will publish:
 - Migrations: `database/migrations/`
 - Views: `resources/views/vendor/uptime-monitor-extended/`
 
+> **Note**: If the config file already exists, Laravel will skip it to preserve your customizations. If a new version adds configuration options, you can either:
+> - Use `--force` flag: `php artisan vendor:publish --provider="AxelvdS\UptimeMonitorExtended\UptimeMonitorExtendedServiceProvider" --force` (this will overwrite your customizations)
+> - Manually add the new configuration keys from the package's config file to your published config file
+
 ## Step 4: Run Migrations
 
 Run the migrations:
