@@ -2,40 +2,41 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\Action;
-use Illuminate\Support\Facades\Artisan;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\ListMonitors;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\CreateMonitor;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\EditMonitor;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\ListMonitors;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\ViewMonitor;
-use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
+use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\UptimeMonitor\Models\Monitor;
 
 class MonitorResource extends Resource
 {
     protected static ?string $model = Monitor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-server';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-server';
 
     public static function getNavigationLabel(): string
     {
