@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Checks;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
@@ -55,7 +56,7 @@ class PingCheck
                 'response_time_ms' => $responseTime,
                 'error' => null,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Ping check failed', [
                 'ip' => $ipAddress,
                 'error' => $e->getMessage(),

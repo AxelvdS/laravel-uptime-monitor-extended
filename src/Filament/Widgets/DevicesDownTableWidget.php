@@ -2,6 +2,9 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Carbon\Carbon;
+use Spatie\UptimeMonitor\Models\Monitor;
 use AxelvdS\UptimeMonitorExtended\Dashboard\Widgets\DevicesDownTable;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -27,14 +30,14 @@ class DevicesDownTableWidget extends BaseWidget
             ->recordAction(null) // Explicitly disable record action
             ->recordUrl(null) // Disable record URLs
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Name')
                     ->searchable()
                     ->weight('bold'),
-                Tables\Columns\TextColumn::make('url')
+                TextColumn::make('url')
                     ->label('URL/IP')
                     ->formatStateUsing(function ($state) {
                         // Convert URL object to string if needed
@@ -48,7 +51,7 @@ class DevicesDownTableWidget extends BaseWidget
                         return $url;
                     })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('monitor_type')
+                TextColumn::make('monitor_type')
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -58,7 +61,7 @@ class DevicesDownTableWidget extends BaseWidget
                         'tcp' => 'info',
                         default => 'secondary',
                     }),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->getStateUsing(function ($record) {
@@ -70,7 +73,7 @@ class DevicesDownTableWidget extends BaseWidget
                         'ssl_issue' => 'warning',
                         default => 'secondary',
                     }),
-                Tables\Columns\TextColumn::make('error_message')
+                TextColumn::make('error_message')
                     ->label('Error')
                     ->getStateUsing(function ($record) {
                         // Get error_message from custom attribute (set in getTableRecords)
@@ -80,12 +83,12 @@ class DevicesDownTableWidget extends BaseWidget
                     ->tooltip(function ($record) {
                         return $record->getAttribute('error_message') ?? null;
                     }),
-                Tables\Columns\TextColumn::make('last_checked')
+                TextColumn::make('last_checked')
                     ->label('Last Checked')
                     ->getStateUsing(function ($record) {
                         // Get last_checked from custom attribute (set in getTableRecords)
                         $lastChecked = $record->getAttribute('last_checked') ?? null;
-                        return $lastChecked ? \Carbon\Carbon::parse($lastChecked) : null;
+                        return $lastChecked ? Carbon::parse($lastChecked) : null;
                     })
                     ->dateTime()
                     ->since(),
@@ -100,7 +103,7 @@ class DevicesDownTableWidget extends BaseWidget
     {
         // Return a query for the Monitor model (required by Filament)
         // This is used for model detection, but actual records come from getTableRecords()
-        return \Spatie\UptimeMonitor\Models\Monitor::query();
+        return Monitor::query();
     }
 
     /**
@@ -115,7 +118,7 @@ class DevicesDownTableWidget extends BaseWidget
         
         // Get the actual Monitor models from the database
         $monitorIds = collect($data)->pluck('id')->filter()->toArray();
-        $monitors = \Spatie\UptimeMonitor\Models\Monitor::whereIn('id', $monitorIds)->get()->keyBy('id');
+        $monitors = Monitor::whereIn('id', $monitorIds)->get()->keyBy('id');
         
         // Map data to actual Monitor models and add custom attributes
         $models = collect($data)->map(function ($item) use ($monitors) {
@@ -123,7 +126,7 @@ class DevicesDownTableWidget extends BaseWidget
             
             if (!$monitor) {
                 // Fallback: create a new model if not found
-                $monitor = new \Spatie\UptimeMonitor\Models\Monitor();
+                $monitor = new Monitor();
                 $monitor->id = $item['id'] ?? null;
                 $monitor->exists = true;
             }

@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
 
+use Filament\Actions\EditAction;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -23,7 +24,7 @@ class ViewMonitor extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make(),
         ];
     }
 

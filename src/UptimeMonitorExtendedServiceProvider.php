@@ -2,6 +2,13 @@
 
 namespace AxelvdS\UptimeMonitorExtended;
 
+use Livewire\Livewire;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
+use Throwable;
+use AxelvdS\UptimeMonitorExtended\Commands\CheckMonitorsExtended;
+use AxelvdS\UptimeMonitorExtended\Commands\CleanupLogs;
+use Filament\Facades\Filament;
+use AxelvdS\UptimeMonitorExtended\Filament\UptimeMonitorExtendedFilamentServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Console\Scheduling\Schedule;
@@ -20,18 +27,18 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
 
         // Register Livewire components immediately in register() to ensure they're available
         // This must happen before Filament's package discovery runs
-        if (class_exists(\Livewire\Livewire::class)) {
+        if (class_exists(Livewire::class)) {
             // Force load the relation manager class file
             $relationManagerFile = __DIR__ . '/Filament/Resources/RelationManagers/MonitorLogsRelationManager.php';
             if (file_exists($relationManagerFile)) {
                 require_once $relationManagerFile;
             }
             
-            $relationManagerClass = \AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager::class;
+            $relationManagerClass = MonitorLogsRelationManager::class;
             if (class_exists($relationManagerClass)) {
                 try {
-                    \Livewire\Livewire::component($relationManagerClass);
-                } catch (\Throwable $e) {
+                    Livewire::component($relationManagerClass);
+                } catch (Throwable $e) {
                     // Ignore if already registered or other error
                 }
             }
@@ -58,8 +65,8 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
 
         // Register commands (always register, not just in console, so they can be called via Artisan::call())
         $this->commands([
-            \AxelvdS\UptimeMonitorExtended\Commands\CheckMonitorsExtended::class,
-            \AxelvdS\UptimeMonitorExtended\Commands\CleanupLogs::class,
+            CheckMonitorsExtended::class,
+            CleanupLogs::class,
         ]);
 
         // Register Filament features if Filament is installed
@@ -102,7 +109,7 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
      */
     protected function isFilamentInstalled(): bool
     {
-        return class_exists(\Filament\Facades\Filament::class) ||
+        return class_exists(Filament::class) ||
                class_exists(\Filament\Filament::class);
     }
 
@@ -112,8 +119,8 @@ class UptimeMonitorExtendedServiceProvider extends ServiceProvider
     protected function registerFilamentFeatures(): void
     {
         // Register Filament service provider
-        if (class_exists(\AxelvdS\UptimeMonitorExtended\Filament\UptimeMonitorExtendedFilamentServiceProvider::class)) {
-            $this->app->register(\AxelvdS\UptimeMonitorExtended\Filament\UptimeMonitorExtendedFilamentServiceProvider::class);
+        if (class_exists(UptimeMonitorExtendedFilamentServiceProvider::class)) {
+            $this->app->register(UptimeMonitorExtendedFilamentServiceProvider::class);
         }
     }
 

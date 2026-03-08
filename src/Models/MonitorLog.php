@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Models;
 
+use Spatie\UptimeMonitor\Models\Monitor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,7 +29,7 @@ class MonitorLog extends Model
      */
     public function monitor(): BelongsTo
     {
-        return $this->belongsTo(\Spatie\UptimeMonitor\Models\Monitor::class);
+        return $this->belongsTo(Monitor::class);
     }
 
     /**

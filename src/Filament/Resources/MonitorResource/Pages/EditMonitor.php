@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -23,7 +24,7 @@ class EditMonitor extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

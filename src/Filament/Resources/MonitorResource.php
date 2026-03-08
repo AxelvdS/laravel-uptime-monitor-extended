@@ -2,10 +2,30 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\Action;
+use Illuminate\Support\Facades\Artisan;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\ListMonitors;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\CreateMonitor;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\EditMonitor;
+use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages\ViewMonitor;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource\Pages;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -44,31 +64,31 @@ class MonitorResource extends Resource
         return config('uptime-monitor-extended.filament.navigation_label', 'Monitors');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->label('Name')
                     ->required()
                     ->helperText('A friendly name to identify this monitor (e.g., "Main Router", "API Server")')
                     ->maxLength(255)
                     ->columnSpanFull(),
 
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->label('Description')
                     ->helperText('Optional description of what this monitor is for')
                     ->maxLength(65535)
                     ->columnSpanFull(),
 
-                Forms\Components\TextInput::make('url')
+                TextInput::make('url')
                     ->label('URL, IP Address, or Host:Port')
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->live(onBlur: true)
                     ->helperText('Enter a URL (http:// or https://), IP address for ping, or host:port for TCP (e.g., 192.168.1.1:22)')
                     ->maxLength(255)
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, Set $set) {
                         if (empty($state)) {
                             return;
                         }
@@ -109,7 +129,7 @@ class MonitorResource extends Resource
                         }
                     }),
 
-                Forms\Components\Select::make('monitor_type')
+                Select::make('monitor_type')
                     ->label('Monitor Type')
                     ->options([
                         'https' => 'HTTPS',
@@ -121,7 +141,7 @@ class MonitorResource extends Resource
                     ->required()
                     ->helperText('Select the type of monitoring to perform. For TCP Port, use format: host:port (e.g., 192.168.1.1:22)'),
 
-                Forms\Components\TextInput::make('frequency_minutes')
+                TextInput::make('frequency_minutes')
                     ->label('Check Frequency (minutes)')
                     ->numeric()
                     ->default(config('uptime-monitor-extended.default_frequency_minutes', 5))
@@ -129,18 +149,18 @@ class MonitorResource extends Resource
                     ->minValue(1)
                     ->helperText('How often to check this monitor'),
 
-                Forms\Components\Toggle::make('is_active')
+                Toggle::make('is_active')
                     ->label('Active')
                     ->default(true)
                     ->helperText('Enable or disable monitoring for this monitor'),
 
-                Forms\Components\Textarea::make('look_for_string')
+                Textarea::make('look_for_string')
                     ->label('Look for String')
                     ->helperText('Optional: Check for specific content in the response')
                     ->maxLength(65535)
                     ->columnSpanFull(),
 
-                Forms\Components\Textarea::make('notes')
+                Textarea::make('notes')
                     ->label('Notes')
                     ->helperText('Optional notes or description')
                     ->maxLength(65535)
@@ -153,17 +173,17 @@ class MonitorResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Name')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
 
-                Tables\Columns\TextColumn::make('url')
+                TextColumn::make('url')
                     ->label('Address')
                     ->searchable()
                     ->sortable()
@@ -179,7 +199,7 @@ class MonitorResource extends Resource
                         return $url;
                     }),
 
-                Tables\Columns\TextColumn::make('monitor_type')
+                TextColumn::make('monitor_type')
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -191,27 +211,27 @@ class MonitorResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('frequency_minutes')
+                TextColumn::make('frequency_minutes')
                     ->label('Frequency (min)')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('last_check_at')
+                TextColumn::make('last_check_at')
                     ->label('Last Checked')
                     ->dateTime()
                     ->sortable()
                     ->since(),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->getStateUsing(function (Monitor $record) {
                         // Get latest log status
-                        $latestLog = \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::where('monitor_id', $record->id)
+                        $latestLog = MonitorLog::where('monitor_id', $record->id)
                             ->latest('checked_at')
                             ->first();
                         return $latestLog?->status ?? 'unknown';
@@ -223,14 +243,14 @@ class MonitorResource extends Resource
                         default => 'secondary',
                     }),
 
-                Tables\Columns\TextColumn::make('uptime_check_failed_at')
+                TextColumn::make('uptime_check_failed_at')
                     ->label('Failed At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('monitor_type')
+                SelectFilter::make('monitor_type')
                     ->options([
                         'https' => 'HTTPS',
                         'http' => 'HTTP',
@@ -238,10 +258,10 @@ class MonitorResource extends Resource
                         'tcp' => 'TCP Port',
                     ]),
 
-                Tables\Filters\TernaryFilter::make('is_active')
+                TernaryFilter::make('is_active')
                     ->label('Active Status'),
 
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->label('Status')
                     ->options([
                         'up' => 'Up',
@@ -250,7 +270,7 @@ class MonitorResource extends Resource
                     ])
                     ->query(function ($query, array $data) {
                         if (!empty($data['value'])) {
-                            $monitorIds = \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::select('monitor_id')
+                            $monitorIds = MonitorLog::select('monitor_id')
                                 ->where('status', $data['value'])
                                 ->whereIn('id', function ($subQuery) {
                                     $subQuery->selectRaw('MAX(id)')
@@ -264,23 +284,23 @@ class MonitorResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('check_now')
+                Action::make('check_now')
                     ->label('Check Now')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function (Monitor $record) {
-                        \Illuminate\Support\Facades\Artisan::call('uptime-monitor:check-extended', [
+                        Artisan::call('uptime-monitor:check-extended', [
                             '--monitor-id' => $record->id,
                         ]);
                     })
                     ->requiresConfirmation()
                     ->successNotificationTitle('Monitor check initiated'),
 
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->recordUrl(fn (Monitor $record) => MonitorResource::getUrl('view', ['record' => $record]));
@@ -296,10 +316,10 @@ class MonitorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMonitors::route('/'),
-            'create' => Pages\CreateMonitor::route('/create'),
-            'edit' => Pages\EditMonitor::route('/{record}/edit'),
-            'view' => Pages\ViewMonitor::route('/{record}'),
+            'index' => ListMonitors::route('/'),
+            'create' => CreateMonitor::route('/create'),
+            'edit' => EditMonitor::route('/{record}/edit'),
+            'view' => ViewMonitor::route('/{record}'),
         ];
     }
 }

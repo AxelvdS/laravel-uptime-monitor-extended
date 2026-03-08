@@ -2,8 +2,14 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -30,30 +36,30 @@ class MonitorLogsRelationManager extends RelationManager
      * Get the relationship.
      * Since we can't modify Spatie's Monitor model, we create a dynamic relationship.
      */
-    public function getRelationship(): \Illuminate\Database\Eloquent\Relations\Relation
+    public function getRelationship(): Relation
     {
         $owner = $this->getOwnerRecord();
         
         // Create a dynamic hasMany relationship
         return $owner->hasMany(
-            \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::class,
+            MonitorLog::class,
             'monitor_id',
             'id'
         );
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('status')
+        return $schema
+            ->components([
+                TextInput::make('status')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('response_time_ms')
+                TextInput::make('response_time_ms')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('error_message')
+                Textarea::make('error_message')
                     ->maxLength(65535),
-                Forms\Components\DateTimePicker::make('checked_at')
+                DateTimePicker::make('checked_at')
                     ->required(),
             ]);
     }
@@ -63,10 +69,10 @@ class MonitorLogsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -77,28 +83,28 @@ class MonitorLogsRelationManager extends RelationManager
                         default => 'secondary',
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('response_time_ms')
+                TextColumn::make('response_time_ms')
                     ->label('Response Time')
                     ->formatStateUsing(fn ($state) => $state ? $state . ' ms' : '-')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('error_message')
+                TextColumn::make('error_message')
                     ->label('Error')
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->error_message)
                     ->wrap(),
-                Tables\Columns\TextColumn::make('checked_at')
+                TextColumn::make('checked_at')
                     ->label('Checked At')
                     ->dateTime()
                     ->sortable()
                     ->since(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options([
                         'up' => 'Up',
                         'down' => 'Down',

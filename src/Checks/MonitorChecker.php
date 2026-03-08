@@ -2,6 +2,10 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Checks;
 
+use GuzzleHttp\Client;
+use Carbon\Carbon;
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use AxelvdS\UptimeMonitorExtended\Checks\PingCheck;
 use AxelvdS\UptimeMonitorExtended\Checks\TcpPortCheck;
 use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
@@ -122,7 +126,7 @@ class MonitorChecker
             $url = (string) $monitor->url;
             $startTime = microtime(true);
             
-            $client = new \GuzzleHttp\Client([
+            $client = new Client([
                 'timeout' => 10,
                 'verify' => true, // Enable SSL verification
                 'allow_redirects' => true,
@@ -152,17 +156,17 @@ class MonitorChecker
                 try {
                     $certInfo = $this->getCertificateInfo($url);
                     if ($certInfo && isset($certInfo['valid_to'])) {
-                        $expiresAt = \Carbon\Carbon::createFromTimestamp($certInfo['valid_to']);
+                        $expiresAt = Carbon::createFromTimestamp($certInfo['valid_to']);
                         if ($expiresAt->isPast()) {
                             $status = 'ssl_issue';
                         } elseif ($expiresAt->diffInDays(now()) < 7) {
                             $status = 'ssl_expiring';
                         }
                     }
-                    
+
                     // Note: Revoked certificate checking would require full OCSP/CRL implementation
                     // For now, revoked certificates are detected via connection errors in exception handling
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // SSL check failed, but HTTP might still be up
                     // If the error mentions revoked, expired, or untrusted, we'll catch it in the exception handler
                 }
@@ -190,7 +194,7 @@ class MonitorChecker
                 'response_time_ms' => round($responseTime, 2),
                 'message' => $isUp ? 'HTTP check successful' : ($stringNotFound ? "Required string not found in response" : "HTTP check failed (Status: {$statusCode})"),
             ];
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        } catch (RequestException $e) {
             $errorMessage = $e->getMessage();
             $status = 'down';
             
@@ -253,7 +257,7 @@ class MonitorChecker
                 'status' => $status,
                 'message' => $errorMessage,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errorMessage = $e->getMessage();
             $status = 'down';
             
@@ -361,7 +365,7 @@ class MonitorChecker
             }
             
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

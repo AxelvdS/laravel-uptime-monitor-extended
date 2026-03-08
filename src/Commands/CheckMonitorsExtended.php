@@ -2,6 +2,9 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Commands;
 
+use Exception;
+use AxelvdS\UptimeMonitorExtended\Models\MonitorLog;
+use Illuminate\Support\Facades\Log;
 use AxelvdS\UptimeMonitorExtended\Checks\MonitorChecker;
 use Illuminate\Console\Command;
 use Spatie\UptimeMonitor\Models\Monitor;
@@ -83,9 +86,9 @@ class CheckMonitorsExtended extends Command
                 $this->error("  ✗ {$result['status']} - {$result['message']}");
                 return 1;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Ensure we log the error even if check() fails completely
-            \AxelvdS\UptimeMonitorExtended\Models\MonitorLog::create([
+            MonitorLog::create([
                 'monitor_id' => $monitor->id,
                 'status' => 'down',
                 'error_message' => $e->getMessage(),
@@ -93,7 +96,7 @@ class CheckMonitorsExtended extends Command
             ]);
             
             $this->error("  ✗ Error: {$e->getMessage()}");
-            \Illuminate\Support\Facades\Log::error('Monitor check failed with exception', [
+            Log::error('Monitor check failed with exception', [
                 'monitor_id' => $monitor->id,
                 'url' => $monitor->url,
                 'error' => $e->getMessage(),

@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Checks;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class TcpPortCheck
@@ -43,7 +44,7 @@ class TcpPortCheck
                 'response_time_ms' => null,
                 'error' => $errstr ?: "Connection refused (Error: {$errno})",
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('TCP port check failed', [
                 'host' => $host,
                 'port' => $port,

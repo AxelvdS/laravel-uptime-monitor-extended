@@ -2,6 +2,7 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament\Widgets;
 
+use Carbon\Carbon;
 use AxelvdS\UptimeMonitorExtended\Dashboard\Widgets\UptimeGraph;
 use Filament\Widgets\ChartWidget;
 
@@ -43,7 +44,7 @@ class UptimeGraphWidget extends ChartWidget
                 ],
             ],
             'labels' => array_map(function ($item) {
-                return \Carbon\Carbon::parse($item['time'])->format('H:i');
+                return Carbon::parse($item['time'])->format('H:i');
             }, $data),
         ];
     }

@@ -2,6 +2,10 @@
 
 namespace AxelvdS\UptimeMonitorExtended\Filament;
 
+use Livewire\Livewire;
+use Throwable;
+use Filament\Facades\Filament;
+use Exception;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\MonitorResource;
 use AxelvdS\UptimeMonitorExtended\Filament\Resources\RelationManagers\MonitorLogsRelationManager;
 use AxelvdS\UptimeMonitorExtended\Filament\Widgets\DevicesDownTableWidget;
@@ -18,10 +22,10 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register Livewire components (widgets and relation managers) early in register() so they're available when needed
-        if (class_exists(\Livewire\Livewire::class)) {
-            \Livewire\Livewire::component(UpDownStatsWidget::class);
-            \Livewire\Livewire::component(DevicesDownTableWidget::class);
-            \Livewire\Livewire::component(UptimeGraphWidget::class);
+        if (class_exists(Livewire::class)) {
+            Livewire::component(UpDownStatsWidget::class);
+            Livewire::component(DevicesDownTableWidget::class);
+            Livewire::component(UptimeGraphWidget::class);
             
             // Register relation manager immediately
             // Force load the class file to ensure it's available
@@ -32,8 +36,8 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
             
             if (class_exists(MonitorLogsRelationManager::class)) {
                 try {
-                    \Livewire\Livewire::component(MonitorLogsRelationManager::class);
-                } catch (\Throwable $e) {
+                    Livewire::component(MonitorLogsRelationManager::class);
+                } catch (Throwable $e) {
                     // Ignore if already registered
                 }
             }
@@ -47,15 +51,15 @@ class UptimeMonitorExtendedFilamentServiceProvider extends ServiceProvider
     {
         // Auto-register resources and widgets for configured Filament panels
         // See config('uptime-monitor-extended.filament.panels') to control which panels
-        if (class_exists(\Filament\Facades\Filament::class)) {
-            \Filament\Facades\Filament::serving(function () {
+        if (class_exists(Filament::class)) {
+            Filament::serving(function () {
                 // Get all registered panels and register resources/widgets for each
                 try {
-                    $panels = \Filament\Facades\Filament::getPanels();
+                    $panels = Filament::getPanels();
                     foreach ($panels as $panel) {
                         self::registerForPanel($panel);
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // If panels aren't available yet, that's okay
                     // Users can manually register via registerForPanel()
                 }
