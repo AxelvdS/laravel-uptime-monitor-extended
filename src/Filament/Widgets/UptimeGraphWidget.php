@@ -73,9 +73,11 @@ class UptimeGraphWidget extends ChartWidget
         ];
     }
 
-    protected function getHeight(): ?int
+    protected function getMaxHeight(): ?string
     {
-        return config('uptime-monitor-extended.dashboard.graph_height', 200);
+        $height = config('uptime-monitor-extended.dashboard.monitors.graph_height', 200);
+
+        return is_numeric($height) ? "{$height}px" : $height;
     }
 }
 
